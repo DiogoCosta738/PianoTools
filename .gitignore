@@ -1,3 +1,4 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+soundfonts/Arachno_SoundFont_Version_1.0.sf2

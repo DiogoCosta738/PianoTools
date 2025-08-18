@@ -16,6 +16,7 @@ public partial class MidiSoundPlayer : Node
 	[Export] KeyboardController keyboardController;
 	[Export] SoundfontConfigUI soundfontConfigUI;
 	[Export] MidiKeyboardController midiInputController;
+	[Export] StaffController staffController;
 
 	[Export(PropertyHint.File)] string _soundfontPath;
 	[Export(PropertyHint.File)] string _midiPath;
@@ -118,6 +119,8 @@ public partial class MidiSoundPlayer : Node
 		GD.Print("Note on: ", note, " ", velocity);
 		_player.PlayNote(_channel, note, velocity);
 		pianoController.NoteOn(note);
+
+		staffController.CallDeferred("UpdateNote", note);
 	}
 
 	public void StopNote(int note)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dsjcitfq3sjeb"]
+[gd_scene load_steps=12 format=3 uid="uid://dsjcitfq3sjeb"]
 
 [ext_resource type="Script" uid="uid://cny5iv8sbjirt" path="res://MidiGame/MidiReader.cs" id="1_xsb4v"]
 [ext_resource type="Script" uid="uid://dyw5f2xvodjl0" path="res://MidiGame/MidiCamera.cs" id="2_jxnqx"]
@@ -8,6 +8,11 @@
 [ext_resource type="Script" uid="uid://dx4gkvlr1i0r" path="res://MidiGame/MidiSoundPlayer.cs" id="4_kjjcl"]
 [ext_resource type="Script" uid="uid://df2hst5nekh01" path="res://MidiGame/PianoUI/PianoUIController.cs" id="6_kesap"]
 [ext_resource type="Script" uid="uid://cj1y3yiafofum" path="res://MidiGame/SoundfontConfigUI.cs" id="7_04x8u"]
+[ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
+[ext_resource type="Texture2D" uid="uid://dtsxcaa2mt2rb" path="res://Assets/pngwing.com.png" id="9_uqpa1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pqyki"]
+bg_color = Color(1, 1, 1, 1)
 
 [node name="MIDIScene" type="Node"]
 
@@ -36,16 +41,16 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("7_04x8u")
-container = NodePath("../MarginContainer")
-octavesLabel = NodePath("../MarginContainer/LeftPanel/OctaveControls/OctaveLabel")
-octaveUpButton = NodePath("../MarginContainer/LeftPanel/OctaveControls/OctaveUp")
-octaveDownButton = NodePath("../MarginContainer/LeftPanel/OctaveControls/OctaveDown")
-transposeLabel = NodePath("../MarginContainer/LeftPanel/TransposeControls/TransposeLabel")
-transposeUpButton = NodePath("../MarginContainer/LeftPanel/TransposeControls/TransposeUp")
-transposeDownButton = NodePath("../MarginContainer/LeftPanel/TransposeControls/TransposeDown")
-hideButton = NodePath("../MarginContainer/LeftPanel/HideButton")
+container = NodePath("../VisualTranspositionControls")
+octavesLabel = NodePath("../VisualTranspositionControls/LeftPanel/OctaveControls/OctaveLabel")
+octaveUpButton = NodePath("../VisualTranspositionControls/LeftPanel/OctaveControls/OctaveUp")
+octaveDownButton = NodePath("../VisualTranspositionControls/LeftPanel/OctaveControls/OctaveDown")
+transposeLabel = NodePath("../VisualTranspositionControls/LeftPanel/TransposeControls/TransposeLabel")
+transposeUpButton = NodePath("../VisualTranspositionControls/LeftPanel/TransposeControls/TransposeUp")
+transposeDownButton = NodePath("../VisualTranspositionControls/LeftPanel/TransposeControls/TransposeDown")
+hideButton = NodePath("../VisualTranspositionControls/LeftPanel/HideButton")
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+[node name="VisualTranspositionControls" type="MarginContainer" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 40.0
 theme_override_constants/margin_left = 10
@@ -53,11 +58,11 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="LeftPanel" type="VBoxContainer" parent="CanvasLayer/MarginContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="CanvasLayer/VisualTranspositionControls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="TransposeLabel" type="Label" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="TransposeLabel" type="Label" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -65,29 +70,29 @@ text = "Transpose"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TransposeControls" type="HBoxContainer" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="TransposeControls" type="HBoxContainer" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TransposeDown" type="Button" parent="CanvasLayer/MarginContainer/LeftPanel/TransposeControls"]
+[node name="TransposeDown" type="Button" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/TransposeControls"]
 layout_direction = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "-"
 
-[node name="TransposeLabel" type="Label" parent="CanvasLayer/MarginContainer/LeftPanel/TransposeControls"]
+[node name="TransposeLabel" type="Label" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/TransposeControls"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TransposeUp" type="Button" parent="CanvasLayer/MarginContainer/LeftPanel/TransposeControls"]
+[node name="TransposeUp" type="Button" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/TransposeControls"]
 layout_direction = 3
 layout_mode = 2
 size_flags_horizontal = 3
 text = "+"
 
-[node name="OctaveLabel" type="Label" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="OctaveLabel" type="Label" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -95,35 +100,35 @@ text = "Octave"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OctaveControls" type="HBoxContainer" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="OctaveControls" type="HBoxContainer" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="OctaveDown" type="Button" parent="CanvasLayer/MarginContainer/LeftPanel/OctaveControls"]
+[node name="OctaveDown" type="Button" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/OctaveControls"]
 layout_direction = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "-"
 
-[node name="OctaveLabel" type="Label" parent="CanvasLayer/MarginContainer/LeftPanel/OctaveControls"]
+[node name="OctaveLabel" type="Label" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/OctaveControls"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OctaveUp" type="Button" parent="CanvasLayer/MarginContainer/LeftPanel/OctaveControls"]
+[node name="OctaveUp" type="Button" parent="CanvasLayer/VisualTranspositionControls/LeftPanel/OctaveControls"]
 layout_direction = 3
 layout_mode = 2
 size_flags_horizontal = 3
 text = "+"
 
-[node name="InstrumentDropdown" type="OptionButton" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="InstrumentDropdown" type="OptionButton" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 item_count = 1
 popup/item_0/text = "Test"
 popup/item_0/id = 0
 
-[node name="HideButton" type="Button" parent="CanvasLayer/MarginContainer/LeftPanel"]
+[node name="HideButton" type="Button" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
 layout_mode = 2
 size_flags_vertical = 0
 text = "Hide/Show
@@ -137,12 +142,47 @@ offset_bottom = 40.0
 script = ExtResource("6_kesap")
 pianoKeyScene = "res://MidiGame/PianoUI/PianoKeyScene.tscn"
 
-[node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController")]
+[node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("container", "lineTemplate", "noteTexture")]
+offset_left = 486.0
+offset_top = 129.0
+offset_right = 526.0
+offset_bottom = 169.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_pqyki")
+script = ExtResource("8_pqyki")
+container = NodePath("MarginContainer/Container")
+lineTemplate = NodePath("MarginContainer/Container/ColorRect")
+noteTexture = NodePath("MarginContainer/Container/TextureRect")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/StaffController"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Container" type="Control" parent="CanvasLayer/StaffController/MarginContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/Container"]
+layout_mode = 0
+offset_bottom = 5.0
+color = Color(0, 0, 0, 1)
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/Container"]
+layout_mode = 0
+offset_right = 17.1563
+offset_bottom = 15.0
+texture = ExtResource("9_uqpa1")
+expand_mode = 3
+
+[node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController")]
 script = ExtResource("4_kjjcl")
 pianoController = NodePath("../CanvasLayer/PianoController")
-instrumentOptions = NodePath("../CanvasLayer/MarginContainer/LeftPanel/InstrumentDropdown")
+instrumentOptions = NodePath("../CanvasLayer/VisualTranspositionControls/LeftPanel/InstrumentDropdown")
 keyboardController = NodePath("../KeyboardController")
 soundfontConfigUI = NodePath("../CanvasLayer/SoundFontConfigUI")
 midiInputController = NodePath("../MidiKeyboardController")
+staffController = NodePath("../CanvasLayer/StaffController")
 _soundfontPath = "res://soundfonts/Arachno_SoundFont_Version_1.0.sf2"
 _midiPath = "res://midi/zeldalullaby.mid"

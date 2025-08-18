@@ -5,7 +5,7 @@ using System.IO;
 
 public partial class PianoUIController : Control
 {
-	[Export] bool mouseInput = false;
+	[Export] bool mouseInput = true;
 	[Export(PropertyHint.File)] string pianoKeyScene;
 	private Vector4I _margins = new Vector4I(1,1,1,1) * 20;
 	private int _octaves = 3;
@@ -128,9 +128,9 @@ public partial class PianoUIController : Control
 
 	public string GetNoteNameShort(int midiNote)
 	{
-		int octave = (midiNote + 1) / 12;
+		int octave = (midiNote) / 12;
 		int semitone = midiNote % 12;
-		return $"{noteShortName[semitone]}{octave - 2}";
+		return $"{noteShortName[semitone]}{octave}";
 	}
 
 	private int NoteToKeyIndex(int midiNote)

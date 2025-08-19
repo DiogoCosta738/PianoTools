@@ -130,7 +130,7 @@ public partial class StaffController : Node
         UpdateNote(noteIndex, 1);
     }
 
-    public void UpdateNote(int noteIndex, int idx)
+    public void UpdateNote(int noteIndex, int idx, bool hideLabel = false, bool hideNote = false)
     {
         if (noteIndex == -1)
         {
@@ -139,9 +139,9 @@ public partial class StaffController : Node
             return;
         }
 
-        noteLabels[idx].Visible = true;
+        noteLabels[idx].Visible = !hideLabel;
         noteLabels[idx].Text = PianoUIController.GetNoteNameShort(noteIndex);
-        noteTextures[idx].Visible = true;
+        noteTextures[idx].Visible = !hideNote;
         int octave = noteIndex < 0 ? 0 : noteIndex / 12;
         int noteNameIndex = SemitoneToTone(noteIndex % 12);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));

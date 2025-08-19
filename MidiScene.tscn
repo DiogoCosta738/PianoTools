@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dsjcitfq3sjeb"]
+[gd_scene load_steps=13 format=3 uid="uid://dsjcitfq3sjeb"]
 
 [ext_resource type="Script" uid="uid://cny5iv8sbjirt" path="res://MidiGame/MidiReader.cs" id="1_xsb4v"]
 [ext_resource type="Script" uid="uid://dyw5f2xvodjl0" path="res://MidiGame/MidiCamera.cs" id="2_jxnqx"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://b14myad2rx52f" path="res://MidiGame/KeyboardController.cs" id="4_1iknw"]
 [ext_resource type="Script" uid="uid://tt2qlg4xxypu" path="res://MidiGame/MidiKeyboardController.cs" id="4_3pot7"]
 [ext_resource type="Script" uid="uid://dx4gkvlr1i0r" path="res://MidiGame/MidiSoundPlayer.cs" id="4_kjjcl"]
+[ext_resource type="Script" uid="uid://bgay187ww07rx" path="res://Exercises/NotePlayExerciseController.cs" id="6_4vvoa"]
 [ext_resource type="Script" uid="uid://df2hst5nekh01" path="res://MidiGame/PianoUI/PianoUIController.cs" id="6_kesap"]
 [ext_resource type="Script" uid="uid://cj1y3yiafofum" path="res://MidiGame/SoundfontConfigUI.cs" id="7_04x8u"]
 [ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
@@ -32,6 +33,20 @@ script = ExtResource("4_3pot7")
 
 [node name="KeyboardController" type="Node" parent="."]
 script = ExtResource("4_1iknw")
+
+[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "pianoController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck")]
+script = ExtResource("6_4vvoa")
+midiKeyboardController = NodePath("../MidiKeyboardController")
+staffController = NodePath("../CanvasLayer/StaffController")
+pianoController = NodePath("../CanvasLayer/PianoController")
+scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/Label")
+feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/RichTextLabel")
+startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/StartButton")
+resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/ResetButton")
+useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/LabelCheck")
+useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/SheetCheck")
+useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/SharpsCheck")
+useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/FlatsCheck")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -143,7 +158,7 @@ script = ExtResource("6_kesap")
 pianoKeyScene = "res://MidiGame/PianoUI/PianoKeyScene.tscn"
 
 [node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("notesContainer", "labelsContainer", "noteTexture", "noteLabel")]
-anchors_preset = -1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -60.0
@@ -202,6 +217,71 @@ offset_right = 22.875
 offset_bottom = 20.0
 texture = ExtResource("9_uqpa1")
 expand_mode = 3
+
+[node name="NotePlayExerciseUI" type="PanelContainer" parent="CanvasLayer"]
+offset_left = 873.0
+offset_top = 32.0
+offset_right = 913.0
+offset_bottom = 72.0
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Standby"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Score: 0 / 0 (100%)"
+
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Use flats"
+
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Use sharps"
+
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Name note"
+
+[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Render note
+"
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Start"
+
+[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Reset
+"
 
 [node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController")]
 script = ExtResource("4_kjjcl")

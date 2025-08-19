@@ -37,12 +37,9 @@ public partial class StaffController : Node
         {
             ColorRect line = (ColorRect)lineTemplate.Duplicate();
             line.Visible = true;
-            Color[] colors = new Color[] {
-                Colors.Red, Colors.Green, Colors.Blue, Colors.Yellow, Colors.Black, Colors.Gray
-            };
-            line.Color = colors[i];
+            line.Color = Colors.Black;
             line.Size = new Vector2(container.Size.X, thickness);
-            line.Position = new Vector2(0, topOffset + spacing * i + thickness / 2);
+            line.Position = new Vector2(0, topOffset + spacing * i - thickness / 2);
 
             staffLines.Add(line);
             container.AddChild(line);
@@ -76,7 +73,7 @@ public partial class StaffController : Node
     public float GetNoteHeight(int noteNameIndex, int octave)
     {
         float firstStaffHeight = spacing;
-        float secondStaffHeight = spacing * 3 + spacing * 5 + spacing * 3;
+        float secondStaffHeight = spacing * 3 + spacing * 5 + spacing * 2; // the first note c4 is where?
         switch (staffType)
         {
             case StaffType.Treble:
@@ -130,7 +127,11 @@ public partial class StaffController : Node
         int octave = noteIndex < 0 ? 0 : noteIndex / 12;
         int noteNameIndex = SemitoneToTone(noteIndex % 12);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));
-        noteTexture.Position = new Vector2(noteTexture.Position.X, GetNoteHeight(noteNameIndex, octave) - noteTexture.Size.Y / 2);
+
+        float xx = container.Size.X / 2 - noteTexture.Size.X / 2;
+        float yy = GetNoteHeight(noteNameIndex, octave) - noteTexture.Size.Y / 2;
+
+        noteTexture.Position = new Vector2(xx, yy);
     }
 
     public override void _Ready()

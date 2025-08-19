@@ -21,6 +21,8 @@ public partial class StaffController : Node
     List<TextureRect> noteTextures;
     List<Label> noteLabels;
 
+    List<int> notesDown;
+
     const float thickness = 4; // thickness of a sheet line
     const float spacing = 20; // distance between two sheet lines
     const float firstStaffTopMargin = spacing * 2 + spacing / 2; // two full lines plus one half life to account for note head size

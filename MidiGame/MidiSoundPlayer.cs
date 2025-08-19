@@ -32,6 +32,8 @@ public partial class MidiSoundPlayer : Node
 
 	bool waveRendered = false;
 
+	List<int> notesDown;
+
 	private List<MMDevice> GetAudioDevices()
 	{
 		MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
@@ -46,6 +48,8 @@ public partial class MidiSoundPlayer : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		notesDown = new List<int>();
+
 		string soundFontPath = ProjectSettings.GlobalizePath(_soundfontPath);
 		SoundFont soundfont = new SoundFont(soundFontPath);
 		instrumentOptions.Clear();
@@ -120,6 +124,9 @@ public partial class MidiSoundPlayer : Node
 		_player.PlayNote(_channel, note, velocity);
 		pianoController.NoteOn(note);
 
+		if (notesDown.Contains(note)) notesDown.Remove(note);
+		notesDown.Add(note);
+
 		staffController.CallDeferred("UpdateNote", note);
 	}
 
@@ -129,7 +136,10 @@ public partial class MidiSoundPlayer : Node
 		_player.StopNote(_channel, note);
 		pianoController.NoteOff(note);
 
-		staffController.CallDeferred("UpdateNote", -1);
+		if (notesDown.Contains(note)) notesDown.Remove(note);
+		int nextNote = -1;
+		if (notesDown.Count != 0) nextNote = notesDown[notesDown.Count - 1];
+		staffController.CallDeferred("UpdateNote", nextNote);
 	}
 
 	public void SetVolume(int vol)

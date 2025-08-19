@@ -142,16 +142,21 @@ offset_bottom = 40.0
 script = ExtResource("6_kesap")
 pianoKeyScene = "res://MidiGame/PianoUI/PianoKeyScene.tscn"
 
-[node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("container", "lineTemplate", "noteTexture")]
-offset_left = 486.0
-offset_top = 129.0
-offset_right = 526.0
-offset_bottom = 169.0
+[node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("notesContainer", "labelsContainer", "noteTexture", "noteLabel")]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -60.0
+offset_top = 25.0
+offset_right = 60.0
+offset_bottom = 40.0
+grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pqyki")
 script = ExtResource("8_pqyki")
-container = NodePath("MarginContainer/Container")
-lineTemplate = NodePath("MarginContainer/Container/ColorRect")
-noteTexture = NodePath("MarginContainer/Container/TextureRect")
+notesContainer = NodePath("MarginContainer/VBoxContainer/SheetContainer")
+labelsContainer = NodePath("MarginContainer/VBoxContainer/LabelContainer")
+noteTexture = NodePath("MarginContainer/VBoxContainer/SheetContainer/NoteHead")
+noteLabel = NodePath("MarginContainer/VBoxContainer/LabelContainer/Label")
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/StaffController"]
 layout_mode = 2
@@ -160,16 +165,38 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="Container" type="Control" parent="CanvasLayer/StaffController/MarginContainer"]
-custom_minimum_size = Vector2(100, 0)
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/StaffController/MarginContainer"]
 layout_mode = 2
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/Container"]
-layout_mode = 0
-offset_bottom = 5.0
-color = Color(0, 0, 0, 1)
+[node name="LabelContainer" type="Control" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/Container"]
+[node name="Label" type="Label" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/LabelContainer"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "C"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SheetContainer" type="Control" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="DbgBackground" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 0, 0.431373)
+
+[node name="NoteHead" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer"]
 layout_mode = 0
 offset_right = 22.875
 offset_bottom = 20.0

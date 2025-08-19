@@ -128,6 +128,8 @@ public partial class MidiSoundPlayer : Node
 		GD.Print("Note off: ", note);
 		_player.StopNote(_channel, note);
 		pianoController.NoteOff(note);
+
+		staffController.CallDeferred("UpdateNote", -1);
 	}
 
 	public void SetVolume(int vol)

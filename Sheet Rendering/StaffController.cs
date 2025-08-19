@@ -11,14 +11,20 @@ public enum StaffType
 
 public partial class StaffController : Node
 {
-    [Export] Control container;
-    [Export] ColorRect lineTemplate;
+    [Export] Control notesContainer;
+    [Export] Control labelsContainer;
     [Export] TextureRect noteTexture;
+    [Export] Label noteLabel;
 
     List<ColorRect> staffLines;
 
-    float thickness = 4;
-    float spacing = 20;
+    List<TextureRect> noteTextures;
+    List<Label> noteLabels;
+
+    const float thickness = 4; // thickness of a sheet line
+    const float spacing = 20; // distance between two sheet lines
+    const float firstStaffTopMargin = spacing * 2 + spacing / 2; // two full lines plus one half life to account for note head size
+    const float secondStaffTopMargin = firstStaffTopMargin + 5 * spacing + 2 * spacing; // 5 lines from first staff plus two full lines
 
     StaffType staffType = StaffType.Grand;
 
@@ -35,14 +41,14 @@ public partial class StaffController : Node
     {
         for (int i = 0; i < 5; i++)
         {
-            ColorRect line = (ColorRect)lineTemplate.Duplicate();
+            ColorRect line = new ColorRect();
             line.Visible = true;
             line.Color = Colors.Black;
-            line.Size = new Vector2(container.Size.X, thickness);
+            line.Size = new Vector2(notesContainer.Size.X, thickness);
             line.Position = new Vector2(0, topOffset + spacing * i - thickness / 2);
 
             staffLines.Add(line);
-            container.AddChild(line);
+            notesContainer.AddChild(line);
         }
     }
 
@@ -50,30 +56,27 @@ public partial class StaffController : Node
     {
         staffLines = new List<ColorRect>();
 
-        float topOffset = spacing * 3;
-        float height = topOffset; // top offset with room for 2 notes
+        float height = firstStaffTopMargin; // top offset with room for 2 notes
         height += spacing * 5;    // staff height with 5 lines
-        height += 3 * spacing;    // bottom offset with room for 2 notes
+        height += 2 * spacing;    // bottom offset with room for 2 notes
 
-        lineTemplate.Visible = false;
-        AddStaff(topOffset);
+        AddStaff(firstStaffTopMargin);
 
         if (staffType == StaffType.Grand)
         {
-            topOffset += 5 * spacing + 3 * spacing;
-            AddStaff(topOffset);
+            AddStaff(secondStaffTopMargin);
 
             // height += 3 * spacing; // spacing in between staves
             height += spacing * 5; // staff height
-            height += 3 * spacing; // more room at the bottom
+            height += 2 * spacing; // more room at the bottom
         }
-        container.CustomMinimumSize = new Vector2(container.Size.X, height);
+        notesContainer.CustomMinimumSize = new Vector2(notesContainer.Size.X, height);
     }
 
     public float GetNoteHeight(int noteNameIndex, int octave)
     {
-        float firstStaffHeight = spacing;
-        float secondStaffHeight = spacing * 3 + spacing * 5 + spacing * 2; // the first note c4 is where?
+        float firstStaffHeight = spacing / 2;
+        float secondStaffHeight = spacing * 3 + spacing * 5 + spacing / 2; // the first note c4 is where?
         switch (staffType)
         {
             case StaffType.Treble:
@@ -124,19 +127,53 @@ public partial class StaffController : Node
 
     public void UpdateNote(int noteIndex)
     {
+        UpdateNote(noteIndex, 1);
+    }
+
+    public void UpdateNote(int noteIndex, int idx)
+    {
+        if (noteIndex == -1)
+        {
+            noteLabels[idx].Visible = false;
+            noteTextures[idx].Visible = false;
+            return;
+        }
+
+        noteLabels[idx].Visible = true;
+        noteLabels[idx].Text = PianoUIController.GetNoteNameShort(noteIndex);
+        noteTextures[idx].Visible = true;
         int octave = noteIndex < 0 ? 0 : noteIndex / 12;
         int noteNameIndex = SemitoneToTone(noteIndex % 12);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));
 
-        float xx = container.Size.X / 2 - noteTexture.Size.X / 2;
-        float yy = GetNoteHeight(noteNameIndex, octave) - noteTexture.Size.Y / 2;
+        float xx = noteTextures[idx].Position.X;
+        float yy = GetNoteHeight(noteNameIndex, octave) - noteTextures[idx].Size.Y / 2;
 
-        noteTexture.Position = new Vector2(xx, yy);
+        noteTextures[idx].Position = new Vector2(xx, yy);
     }
 
     public override void _Ready()
     {
         base._Ready();
+
+        noteLabels = new List<Label>();
+        noteTextures = new List<TextureRect>();
+
+        noteLabels.Add(noteLabel);
+        noteLabels.Add((Label)noteLabel.Duplicate());
+
+        noteTextures.Add(noteTexture);
+        noteTextures.Add((TextureRect)noteTexture.Duplicate());
+        
+        labelsContainer.AddChild(noteLabels[1]);
+        notesContainer.AddChild(noteTextures[1]);
+
+        noteLabels[0].Position = new Vector2(100 - noteLabel.Size.X / 2, noteLabel.Position.Y);
+        noteLabels[1].Position = new Vector2(250 - noteLabel.Size.X / 2, noteLabel.Position.Y);
+
+        noteTextures[0].Position = new Vector2(100 - noteTexture.Size.X / 2, noteTexture.Position.Y);
+        noteTextures[1].Position = new Vector2(250 - noteTexture.Size.X / 2, noteTexture.Position.Y);
+
         BuildStaff();
     }
 

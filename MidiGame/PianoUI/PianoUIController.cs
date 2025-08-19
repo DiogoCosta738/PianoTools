@@ -122,11 +122,11 @@ public partial class PianoUIController : Control
 		}
 	}
 
-	string[] noteShortName = {
+	static string[] noteShortName = {
 		"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 	};
 
-	public string GetNoteNameShort(int midiNote)
+	public static string GetNoteNameShort(int midiNote)
 	{
 		int octave = (midiNote) / 12;
 		int semitone = midiNote % 12;

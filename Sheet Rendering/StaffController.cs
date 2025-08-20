@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 public enum StaffType
 {
@@ -9,7 +10,7 @@ public enum StaffType
     Grand
 }
 
-public partial class StaffController : Node
+public partial class StaffController : Control
 {
     [Export] Control notesContainer;
     [Export] Control labelsContainer;
@@ -27,6 +28,10 @@ public partial class StaffController : Node
     const float spacing = 20; // distance between two sheet lines
     const float firstStaffTopMargin = spacing * 2 + spacing / 2; // two full lines plus one half life to account for note head size
     const float secondStaffTopMargin = firstStaffTopMargin + 5 * spacing + 2 * spacing; // 5 lines from first staff plus two full lines
+
+    int columnCount = 2;
+    int leftMargin = 50;
+    int columnWidth = 100;
 
     StaffType staffType = StaffType.Grand;
 
@@ -46,7 +51,7 @@ public partial class StaffController : Node
             ColorRect line = new ColorRect();
             line.Visible = true;
             line.Color = Colors.Black;
-            line.Size = new Vector2(notesContainer.Size.X, thickness);
+            line.CustomMinimumSize = new Vector2(GetSheetWidth(), thickness);
             line.Position = new Vector2(0, topOffset + spacing * i - thickness / 2);
 
             staffLines.Add(line);
@@ -72,7 +77,7 @@ public partial class StaffController : Node
             height += spacing * 5; // staff height
             height += 2 * spacing; // more room at the bottom
         }
-        notesContainer.CustomMinimumSize = new Vector2(notesContainer.Size.X, height);
+        notesContainer.CustomMinimumSize = new Vector2(GetSheetWidth(), height);
     }
 
     public float GetNoteHeight(int noteNameIndex, int octave)
@@ -154,6 +159,16 @@ public partial class StaffController : Node
         noteTextures[idx].Position = new Vector2(xx, yy);
     }
 
+    public float GetNoteCenterX(int index)
+    {
+        return leftMargin + columnWidth / 2  + columnWidth * index;
+    }
+
+    float GetSheetWidth()
+    {
+        return leftMargin + columnCount * columnWidth;
+    }
+
     public override void _Ready()
     {
         base._Ready();
@@ -162,20 +177,22 @@ public partial class StaffController : Node
         noteTextures = new List<TextureRect>();
 
         noteLabels.Add(noteLabel);
-        noteLabels.Add((Label)noteLabel.Duplicate());
-
         noteTextures.Add(noteTexture);
-        noteTextures.Add((TextureRect)noteTexture.Duplicate());
-        
-        labelsContainer.AddChild(noteLabels[1]);
-        notesContainer.AddChild(noteTextures[1]);
 
-        noteLabels[0].Position = new Vector2(100 - noteLabel.Size.X / 2, noteLabel.Position.Y);
-        noteLabels[1].Position = new Vector2(250 - noteLabel.Size.X / 2, noteLabel.Position.Y);
+        for (int i = 1; i < columnCount; i++)
+        {
+            noteLabels.Add((Label)noteLabel.Duplicate());
+            noteTextures.Add((TextureRect)noteTexture.Duplicate());
 
-        noteTextures[0].Position = new Vector2(100 - noteTexture.Size.X / 2, noteTexture.Position.Y);
-        noteTextures[1].Position = new Vector2(250 - noteTexture.Size.X / 2, noteTexture.Position.Y);
+            labelsContainer.AddChild(noteLabels[i]);
+            notesContainer.AddChild(noteTextures[i]);
+        }
 
+        for (int i = 0; i < noteLabels.Count; i++)
+        {
+            noteLabels[i].Position = new Vector2(GetNoteCenterX(i) - noteLabel.Size.X / 2, noteLabel.Position.Y);
+            noteTextures[i].Position = new Vector2(GetNoteCenterX(i) - noteTexture.Size.X / 2, noteTexture.Position.Y);
+        }
         BuildStaff();
     }
 

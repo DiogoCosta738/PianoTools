@@ -166,13 +166,13 @@ script = ExtResource("6_kesap")
 pianoKeyScene = "res://MidiGame/PianoUI/PianoKeyScene.tscn"
 
 [node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("notesContainer", "labelsContainer", "noteTexture", "noteLabel")]
-anchors_preset = 5
+anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -60.0
-offset_top = 25.0
-offset_right = 60.0
-offset_bottom = 40.0
+offset_left = -10.0
+offset_top = 55.0
+offset_right = 10.0
+offset_bottom = 74.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pqyki")
 script = ExtResource("8_pqyki")
@@ -206,7 +206,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SheetContainer" type="Control" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
 [node name="DbgBackground" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer"]

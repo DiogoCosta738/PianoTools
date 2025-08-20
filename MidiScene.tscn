@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dsjcitfq3sjeb"]
+[gd_scene load_steps=17 format=3 uid="uid://dsjcitfq3sjeb"]
 
 [ext_resource type="Script" uid="uid://cny5iv8sbjirt" path="res://MidiGame/MidiReader.cs" id="1_xsb4v"]
 [ext_resource type="Script" uid="uid://dyw5f2xvodjl0" path="res://MidiGame/MidiCamera.cs" id="2_jxnqx"]
@@ -12,9 +12,16 @@
 [ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
 [ext_resource type="Texture2D" uid="uid://dtsxcaa2mt2rb" path="res://Assets/pngwing.com.png" id="9_uqpa1"]
 [ext_resource type="Script" uid="uid://cyykvoqv0x68t" path="res://Exercises/NoteNameInput.cs" id="11_ii7y3"]
+[ext_resource type="Script" uid="uid://d3umuwkyvq60n" path="res://GenericUI/DraggablePanelContainer.cs" id="12_y4h0a"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pqyki"]
 bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l2kn"]
+bg_color = Color(0.172549, 0.172549, 0.172549, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y4h0a"]
+bg_color = Color(0.172549, 0.172549, 0.172549, 1)
 
 [node name="MIDIScene" type="Node"]
 
@@ -40,14 +47,14 @@ script = ExtResource("6_4vvoa")
 midiKeyboardController = NodePath("../MidiKeyboardController")
 staffController = NodePath("../CanvasLayer/StaffController")
 pianoController = NodePath("../CanvasLayer/PianoController")
-scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/Label")
-feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/RichTextLabel")
-startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/StartButton")
-resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/ResetButton")
-useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/LabelCheck")
-useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/SheetCheck")
-useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/SharpsCheck")
-useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer/FlatsCheck")
+scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/Label")
+feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/RichTextLabel")
+startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/StartButton")
+resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/ResetButton")
+useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/LabelCheck")
+useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SheetCheck")
+useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SharpsCheck")
+useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/FlatsCheck")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -222,117 +229,137 @@ expand_mode = 3
 [node name="NotePlayExerciseUI" type="PanelContainer" parent="CanvasLayer"]
 offset_left = 873.0
 offset_top = 32.0
-offset_right = 913.0
-offset_bottom = 72.0
+offset_right = 1093.0
+offset_bottom = 350.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5l2kn")
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI"]
+layout_mode = 2
+
+[node name="DraggableComponent2" type="Panel" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer" node_paths=PackedStringArray("parent")]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+script = ExtResource("12_y4h0a")
+parent = NodePath("../..")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 bbcode_enabled = true
 text = "Standby"
 fit_content = true
 horizontal_alignment = 1
 
-[node name="Label" type="Label" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Score: 0 / 0 (100%)"
 
-[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Use flats"
 
-[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Use sharps"
 
-[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 button_pressed = true
 text = "Name note"
 
-[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 button_pressed = true
 text = "Render note
 "
 
-[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Start"
 
-[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/MarginContainer/VBoxContainer"]
+[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Reset
 "
 
-[node name="NoteNameInput" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("octavesLabel", "octavesSlider", "octavesContainer", "noteLabel", "buttonContainer")]
+[node name="NoteInputPanel" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("octavesPanel", "octavesLabel", "octavesSlider", "octavesContainer", "notesPanel", "noteLabel", "buttonContainer")]
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_y4h0a")
 script = ExtResource("11_ii7y3")
-octavesLabel = NodePath("MarginContainer/VBoxContainer/OctavesPanel/OctavesLabel")
-octavesSlider = NodePath("MarginContainer/VBoxContainer/OctavesPanel/OctavesSlider")
-octavesContainer = NodePath("MarginContainer/VBoxContainer/OctavesPanel/OctavesContainer")
-noteLabel = NodePath("MarginContainer/VBoxContainer/NotesPanel/NotesLabel")
-buttonContainer = NodePath("MarginContainer/VBoxContainer/NotesPanel/NotesGridContainer")
+octavesPanel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel")
+octavesLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesLabel")
+octavesSlider = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesSlider")
+octavesContainer = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesContainer")
+notesPanel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel")
+noteLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel/NotesLabel")
+buttonContainer = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel/NotesGridContainer")
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NoteNameInput"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel"]
+layout_mode = 2
+
+[node name="DraggableComponent2" type="Panel" parent="CanvasLayer/NoteInputPanel/VBoxContainer" node_paths=PackedStringArray("parent")]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+script = ExtResource("12_y4h0a")
+parent = NodePath("../..")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NoteNameInput/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer"]
 layout_mode = 2
 
-[node name="OctavesPanel" type="VBoxContainer" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer"]
+[node name="OctavesPanel" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="OctavesLabel" type="Label" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/OctavesPanel"]
+[node name="OctavesLabel" type="Label" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
 layout_mode = 2
 text = "Octave: 1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OctavesContainer" type="Control" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/OctavesPanel"]
+[node name="OctavesContainer" type="Control" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="OctavesSlider" type="HSlider" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/OctavesPanel"]
+[node name="OctavesSlider" type="HSlider" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
 layout_mode = 2
 
-[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/OctavesPanel"]
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
 layout_mode = 2
 
-[node name="NotesPanel" type="VBoxContainer" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer"]
+[node name="NotesPanel" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="NotesLabel" type="Label" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/NotesPanel"]
+[node name="NotesLabel" type="Label" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/NotesPanel"]
 layout_mode = 2
 text = "Note:"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NotesGridContainer" type="GridContainer" parent="CanvasLayer/NoteNameInput/MarginContainer/VBoxContainer/NotesPanel"]
+[node name="NotesGridContainer" type="GridContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/NotesPanel"]
 layout_mode = 2
 columns = 7
 

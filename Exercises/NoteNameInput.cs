@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-public partial class NoteNameInput : Node
+public partial class NoteNameInput : Control
 {
     [Export] Control octavesPanel;
     [Export] Label octavesLabel;

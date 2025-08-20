@@ -34,7 +34,7 @@ public partial class StaffController : Control
     int leftMargin = 50;
     int columnWidth = 100;
 
-    StaffType staffType = StaffType.Bass;
+    StaffType staffType = StaffType.Grand;
 
     public void ClearStaff()
     {
@@ -110,35 +110,6 @@ public partial class StaffController : Control
         return 0;
     }
 
-    // from 0-11 to 0-6
-    // !TODO: should add a "preferSharp" or flat
-    public int SemitoneToTone(int semitone)
-    {
-        switch (semitone)
-        {
-            case 0:
-            case 1:
-                return 0; // c
-            case 2:
-            case 3:
-                return 1; // d
-            case 4:
-                return 2; // e
-            case 5:
-            case 6:
-                return 3; // f
-            case 7:
-            case 8:
-                return 4; // g
-            case 9:
-            case 10:
-                return 5; // a
-            case 11:
-                return 6; // b
-        }
-        return -1;
-    }
-
     public void UpdateNote(int noteIndex)
     {
         UpdateNote(noteIndex, 1);
@@ -154,7 +125,7 @@ public partial class StaffController : Control
         List<float> lines = new List<float>();
         void local_handle_semitone(int midiIndex, ref bool include, List<float> extraLines)
         {
-            if (PianoUIController.HasAccidental(midiIndex))
+            if (NoteUtils.HasAccidental(midiIndex))
                 return;
             else
             {
@@ -194,11 +165,11 @@ public partial class StaffController : Control
         return lines;
     }
 
-    public (int noteNameIndex, int octave, string accidental) SplitMidiNote(int midiIndex, bool preferFlat = false)
+    public static (int noteNameIndex, int octave, string accidental) SplitMidiNote(int midiIndex, bool preferFlat = false)
     {
         int octave = midiIndex < 0 ? 0 : midiIndex / 12;
-        int noteNameIndex = SemitoneToTone(midiIndex % 12);
-        if (PianoUIController.HasAccidental(midiIndex))
+        int noteNameIndex = NoteUtils.SemitoneToTone(midiIndex % 12);
+        if (NoteUtils.HasAccidental(midiIndex))
         {
             if (preferFlat)
             {
@@ -244,7 +215,7 @@ public partial class StaffController : Control
         }
 
         noteLabels[idx].Visible = !hideLabel;
-        noteLabels[idx].Text = PianoUIController.GetNoteNameShort(noteIndex);
+        noteLabels[idx].Text = NoteUtils.GetNoteNameShort(noteIndex);
         noteTextures[idx].Visible = !hideNote;
         (int noteNameIndex, int octave, string accidental) = SplitMidiNote(noteIndex);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));

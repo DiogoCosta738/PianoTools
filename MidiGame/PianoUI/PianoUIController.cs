@@ -126,17 +126,28 @@ public partial class PianoUIController : Control
 		"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
 	};
 
+	static bool[] noteAccidental = {
+		false, true, false, true, false, false, true, false, true, false, true, false
+	};
+
 	public static string GetNoteNameShort(int midiNote)
 	{
 		int octave = (midiNote) / 12;
 		int semitone = midiNote % 12;
 		return $"{noteShortName[semitone]}{octave}";
 	}
+	
+	public static bool HasAccidental(int midiNote)
+	{
+		int octave = (midiNote) / 12;
+		int semitone = midiNote % 12;
+		return noteAccidental[semitone];
+	}
 
 	private int NoteToKeyIndex(int midiNote)
 	{
 		int idx = midiNote - _lowestNote;
-		if(idx < 0 || idx > pianoKeys.Length) return -1;
+		if (idx < 0 || idx > pianoKeys.Length) return -1;
 		return idx;
 	}
 

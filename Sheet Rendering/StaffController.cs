@@ -21,6 +21,7 @@ public partial class StaffController : Control
 
     List<TextureRect> noteTextures;
     List<Label> noteLabels;
+    List<List<ColorRect>> notePartialLines;
 
     List<int> notesDown;
 
@@ -33,7 +34,7 @@ public partial class StaffController : Control
     int leftMargin = 50;
     int columnWidth = 100;
 
-    StaffType staffType = StaffType.Grand;
+    StaffType staffType = StaffType.Bass;
 
     public void ClearStaff()
     {
@@ -44,18 +45,23 @@ public partial class StaffController : Control
         staffLines.Clear();
     }
 
+    ColorRect CreateLine(float x, float y, float width)
+    {
+        ColorRect line = new ColorRect();
+        line.Visible = true;
+        line.Color = Colors.Black;
+        line.CustomMinimumSize = new Vector2(width, thickness);
+        line.Position = new Vector2(x - width / 2, y - thickness / 2);
+        notesContainer.AddChild(line);
+        return line;
+    }
+
     public void AddStaff(float topOffset)
     {
         for (int i = 0; i < 5; i++)
         {
-            ColorRect line = new ColorRect();
-            line.Visible = true;
-            line.Color = Colors.Black;
-            line.CustomMinimumSize = new Vector2(GetSheetWidth(), thickness);
-            line.Position = new Vector2(0, topOffset + spacing * i - thickness / 2);
-
+            ColorRect line = CreateLine(GetSheetWidth() / 2, topOffset + spacing * i, GetSheetWidth());
             staffLines.Add(line);
-            notesContainer.AddChild(line);
         }
     }
 
@@ -89,7 +95,8 @@ public partial class StaffController : Control
             case StaffType.Treble:
                 return firstStaffHeight - spacing / 2 * noteNameIndex - spacing / 2 * 7 * (octave - 6);
             case StaffType.Bass:
-                return firstStaffHeight - spacing / 2 * noteNameIndex - spacing / 2 * 7 * (octave - 4);
+                // E4 is two lines above, which is noteNameIndex 2
+                return firstStaffHeight - spacing / 2 * (noteNameIndex - 2) - spacing / 2 * 7 * (octave - 4);
             case StaffType.Grand:
                 if (octave >= 4)
                 {
@@ -137,8 +144,88 @@ public partial class StaffController : Control
         UpdateNote(noteIndex, 1);
     }
 
+    const int A5 = 69; // first (lowest) note requiring ledger line above treble staff
+    const int E2 = 28; // first (highest) note requiring ledger line below bass staff
+    const int C4 = 48; // first (highest) note requiring ledger line below treble staff and first (lowest) above bass staff
+
+    // as a list of y positions
+    List<float> GetPartialLinesRequired(int noteIndex)
+    {
+        List<float> lines = new List<float>();
+        void local_handle_semitone(int midiIndex, ref bool include, List<float> extraLines)
+        {
+            if (PianoUIController.HasAccidental(midiIndex))
+                return;
+            else
+            {
+                if (include)
+                {
+                    (int noteNameIndex, int octave, string accidental) = SplitMidiNote(midiIndex);
+                    extraLines.Add(GetNoteHeight(noteNameIndex, octave));
+                }
+                include ^= true;
+            }
+        }
+        bool include = true;
+        if ((staffType == StaffType.Treble || staffType == StaffType.Grand) && noteIndex >= A5)
+        {
+            for (int i = A5; i <= noteIndex; i++)
+                local_handle_semitone(i, ref include, lines);
+        }
+        else if ((staffType == StaffType.Bass || staffType == StaffType.Grand) && noteIndex <= E2)
+        {
+            for (int i = E2; i >= noteIndex; i--)
+                local_handle_semitone(i, ref include, lines);
+        }
+        else if (staffType == StaffType.Treble && noteIndex <= C4)
+        {
+            for (int i = C4; i >= noteIndex; i--)
+                local_handle_semitone(i, ref include, lines);
+        }
+        else if (staffType == StaffType.Bass && noteIndex >= C4)
+        {
+            for (int i = C4; i <= noteIndex; i++)
+                local_handle_semitone(i, ref include, lines);
+        }
+        else if (staffType == StaffType.Grand && noteIndex == C4)
+        {
+            return new List<float>() { GetNoteHeight(0, 4) };
+        }
+        return lines;
+    }
+
+    public (int noteNameIndex, int octave, string accidental) SplitMidiNote(int midiIndex, bool preferFlat = false)
+    {
+        int octave = midiIndex < 0 ? 0 : midiIndex / 12;
+        int noteNameIndex = SemitoneToTone(midiIndex % 12);
+        if (PianoUIController.HasAccidental(midiIndex))
+        {
+            if (preferFlat)
+            {
+                noteNameIndex--;
+                if (noteNameIndex < 0)
+                {
+                    octave--;
+                    noteNameIndex = 7;
+                }
+                return (noteNameIndex, octave, "b");
+            }
+            return (noteNameIndex, octave, "#");
+        }
+        else
+        {
+            return (noteNameIndex, octave, "");
+        }
+    }
+
     public void UpdateNote(int noteIndex, int idx, bool hideLabel = false, bool hideNote = false)
     {
+        foreach (var partial in notePartialLines[idx])
+        {
+            partial.QueueFree();
+        }
+        notePartialLines[idx].Clear();
+
         if (noteIndex == -1)
         {
             noteLabels[idx].Visible = false;
@@ -146,11 +233,20 @@ public partial class StaffController : Control
             return;
         }
 
+        List<float> extraLines = GetPartialLinesRequired(noteIndex);
+        if (extraLines is not null)
+        {
+            foreach (float y in extraLines)
+            {
+                ColorRect line = CreateLine(GetNoteCenterX(idx), y, columnWidth / 2);
+                notePartialLines[idx].Add(line);
+            }
+        }
+
         noteLabels[idx].Visible = !hideLabel;
         noteLabels[idx].Text = PianoUIController.GetNoteNameShort(noteIndex);
         noteTextures[idx].Visible = !hideNote;
-        int octave = noteIndex < 0 ? 0 : noteIndex / 12;
-        int noteNameIndex = SemitoneToTone(noteIndex % 12);
+        (int noteNameIndex, int octave, string accidental) = SplitMidiNote(noteIndex);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));
 
         float xx = noteTextures[idx].Position.X;
@@ -175,14 +271,17 @@ public partial class StaffController : Control
 
         noteLabels = new List<Label>();
         noteTextures = new List<TextureRect>();
+        notePartialLines = new List<List<ColorRect>>();
 
         noteLabels.Add(noteLabel);
         noteTextures.Add(noteTexture);
+        notePartialLines.Add(new List<ColorRect>());
 
         for (int i = 1; i < columnCount; i++)
         {
             noteLabels.Add((Label)noteLabel.Duplicate());
             noteTextures.Add((TextureRect)noteTexture.Duplicate());
+            notePartialLines.Add(new List<ColorRect>());
 
             labelsContainer.AddChild(noteLabels[i]);
             notesContainer.AddChild(noteTextures[i]);

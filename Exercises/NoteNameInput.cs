@@ -24,7 +24,7 @@ public partial class NoteNameInput : Control
     int minOctave = 1, maxOctave = 8;
     int curMinOctave = 1, curMaxOctave = 8;
 
-    Action<int, string, int> OnSubmit;
+    Action<(int noteNameIndex, string accidental, int octave)> OnSubmit;
 
     public override void _Ready()
     {
@@ -91,10 +91,10 @@ public partial class NoteNameInput : Control
     void Submit(int note, string accidental)
     {
         int octave = Mathf.RoundToInt(octavesSlider.Value);
-        OnSubmit?.Invoke(note, accidental, octave);
+        OnSubmit?.Invoke((note, accidental, octave));
     }
 
-    public void Setup(bool hasSharp, bool hasFlat, int octaveMin, int octaveMax, Action<int, string, int> OnSubmit)
+    public void Setup(bool hasSharp, bool hasFlat, int octaveMin, int octaveMax, Action<(int noteNameIndex, string accidental, int octave)> OnSubmit)
     {
         this.OnSubmit = OnSubmit;
         for (int i = 0; i < 7; i++)

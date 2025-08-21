@@ -1,7 +1,9 @@
 [gd_scene load_steps=17 format=3 uid="uid://dsjcitfq3sjeb"]
 
+[ext_resource type="Script" uid="uid://bs8yxpuv705go" path="res://DialogueFactory.cs" id="1_5l2kn"]
 [ext_resource type="Script" uid="uid://cny5iv8sbjirt" path="res://MidiGame/MidiReader.cs" id="1_xsb4v"]
 [ext_resource type="Script" uid="uid://dyw5f2xvodjl0" path="res://MidiGame/MidiCamera.cs" id="2_jxnqx"]
+[ext_resource type="PackedScene" uid="uid://ce4oc7mam6qsm" path="res://NoteInputPanelScene.tscn" id="2_sdowb"]
 [ext_resource type="Script" uid="uid://caf64puaisjcu" path="res://MidiGame/MidiTrackRenderer.cs" id="3_mls7y"]
 [ext_resource type="Script" uid="uid://b14myad2rx52f" path="res://MidiGame/KeyboardController.cs" id="4_1iknw"]
 [ext_resource type="Script" uid="uid://tt2qlg4xxypu" path="res://MidiGame/MidiKeyboardController.cs" id="4_3pot7"]
@@ -11,7 +13,6 @@
 [ext_resource type="Script" uid="uid://cj1y3yiafofum" path="res://MidiGame/SoundfontConfigUI.cs" id="7_04x8u"]
 [ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
 [ext_resource type="Texture2D" uid="uid://dtsxcaa2mt2rb" path="res://Assets/pngwing.com.png" id="9_uqpa1"]
-[ext_resource type="Script" uid="uid://cyykvoqv0x68t" path="res://Exercises/NoteNameInput.cs" id="11_ii7y3"]
 [ext_resource type="Script" uid="uid://d3umuwkyvq60n" path="res://GenericUI/DraggablePanelContainer.cs" id="12_y4h0a"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pqyki"]
@@ -20,10 +21,12 @@ bg_color = Color(1, 1, 1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l2kn"]
 bg_color = Color(0.172549, 0.172549, 0.172549, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y4h0a"]
-bg_color = Color(0.172549, 0.172549, 0.172549, 1)
-
 [node name="MIDIScene" type="Node"]
+
+[node name="DialogueFactory" type="Node" parent="." node_paths=PackedStringArray("dialogueContainer")]
+script = ExtResource("1_5l2kn")
+dialogueContainer = NodePath("../CanvasLayer/DialogueContainer")
+noteNameInputScene = ExtResource("2_sdowb")
 
 [node name="MidiReader" type="Node" parent="." node_paths=PackedStringArray("renderer")]
 script = ExtResource("1_xsb4v")
@@ -42,7 +45,7 @@ script = ExtResource("4_3pot7")
 [node name="KeyboardController" type="Node" parent="."]
 script = ExtResource("4_1iknw")
 
-[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "pianoController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck")]
+[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "pianoController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
 script = ExtResource("6_4vvoa")
 midiKeyboardController = NodePath("../MidiKeyboardController")
 staffController = NodePath("../CanvasLayer/StaffController")
@@ -55,6 +58,8 @@ useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/Margin
 useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SheetCheck")
 useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SharpsCheck")
 useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/FlatsCheck")
+waitBackground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground")
+waitForeground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground/WaitForeground")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -166,7 +171,7 @@ script = ExtResource("6_kesap")
 pianoKeyScene = "res://MidiGame/PianoUI/PianoKeyScene.tscn"
 
 [node name="StaffController" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("notesContainer", "labelsContainer", "noteTexture", "noteLabel")]
-anchors_preset = -1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -10.0
@@ -258,6 +263,14 @@ text = "Standby"
 fit_content = true
 horizontal_alignment = 1
 
+[node name="WaitBackground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+color = Color(0.129412, 0.129412, 0.129412, 1)
+
+[node name="WaitForeground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground"]
+layout_mode = 0
+
 [node name="Label" type="Label" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Score: 0 / 0 (100%)"
@@ -299,68 +312,13 @@ layout_mode = 2
 text = "Reset
 "
 
-[node name="NoteInputPanel" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("octavesPanel", "octavesLabel", "octavesSlider", "octavesContainer", "notesPanel", "noteLabel", "buttonContainer")]
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_y4h0a")
-script = ExtResource("11_ii7y3")
-octavesPanel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel")
-octavesLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesLabel")
-octavesSlider = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesSlider")
-octavesContainer = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel/OctavesContainer")
-notesPanel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel")
-noteLabel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel/NotesLabel")
-buttonContainer = NodePath("VBoxContainer/MarginContainer/VBoxContainer/NotesPanel/NotesGridContainer")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel"]
-layout_mode = 2
-
-[node name="DraggableComponent2" type="Panel" parent="CanvasLayer/NoteInputPanel/VBoxContainer" node_paths=PackedStringArray("parent")]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-script = ExtResource("12_y4h0a")
-parent = NodePath("../..")
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer"]
-layout_mode = 2
-
-[node name="OctavesPanel" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="OctavesLabel" type="Label" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
-layout_mode = 2
-text = "Octave: 1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="OctavesContainer" type="Control" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="OctavesSlider" type="HSlider" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
-layout_mode = 2
-
-[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel"]
-layout_mode = 2
-
-[node name="NotesPanel" type="VBoxContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="NotesLabel" type="Label" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/NotesPanel"]
-layout_mode = 2
-text = "Note:"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="NotesGridContainer" type="GridContainer" parent="CanvasLayer/NoteInputPanel/VBoxContainer/MarginContainer/VBoxContainer/NotesPanel"]
-layout_mode = 2
-columns = 7
+[node name="DialogueContainer" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController")]
 script = ExtResource("4_kjjcl")

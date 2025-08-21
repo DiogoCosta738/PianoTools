@@ -2,6 +2,7 @@ using Godot;
 using System;
 using NAudio.Midi;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 public partial class NotePlayExerciseController : Node
 {
@@ -12,11 +13,16 @@ public partial class NotePlayExerciseController : Node
     [Export] RichTextLabel feedbackLabel;
     [Export] Button startButton, resetButton;
     [Export] CheckBox useLabelCheck, useSheetCheck, useSharpsCheck, useFlatsCheck;
+    [Export] ColorRect waitBackground, waitForeground;
 
     int waitingNote;
     int correct = 0;
     int total = 0;
 
+    double waitTarget;
+    double curWait;
+
+    double wrongWaitSeconds = 1, correctWaitSeconds = 1;
     Random rng;
 
     public static (string note, string accidental, int octave) GetNoteName(int midiNote)
@@ -49,7 +55,11 @@ public partial class NotePlayExerciseController : Node
         total = 0;
         waitingNote = -1;
         UpdateScoreLabel();
-        feedbackLabel.Text = "Stand-by";
+
+        curWait = 0;
+        waitTarget = 0;
+        SetFeedback("Stand-by");
+        UpdateWaitingBar();
     }
 
     void StartStop()
@@ -89,7 +99,8 @@ public partial class NotePlayExerciseController : Node
         }
         waitingNote = newNote;
         staffController.UpdateNote(newNote, 0, !useLabelCheck.ButtonPressed, !useSheetCheck.ButtonPressed);
-    }    
+        SetFeedback("Play note!");
+    }
 
     void UpdateScoreLabel()
     {
@@ -98,20 +109,73 @@ public partial class NotePlayExerciseController : Node
 
     public void PlayedNote(int noteIndex)
     {
-        if (waitingNote < 0) return;
+        if (waitingNote < 0 || IsWaiting()) return;
         if (noteIndex == waitingNote)
         {
-            feedbackLabel.Text = "[color=green]Great![/color]";
+            SetFeedback("[color=green]Great![/color]");
             correct++;
             total++;
             UpdateScoreLabel();
-            PickNewNote();
+            StartWaiting(correctWaitSeconds, Colors.Green, () => PickNewNote());
         }
         else
         {
-            feedbackLabel.Text = "[color=red]Wrong![/color]";
+            SetFeedback("[color=red]Wrong![/color]");
             total++;
             UpdateScoreLabel();
+            StartWaiting(wrongWaitSeconds, Colors.Red, () => SetFeedback("Try again!"));
         }
     }
+
+    void SetFeedback(string feedback)
+    {
+        feedbackLabel.Text = feedback;
+    }
+
+    Action OnDoneWaiting;
+    void StartWaiting(double newTarget, Color color, Action onDoneWaiting)
+    {
+        if (IsWaiting())
+            return;
+        waitTarget = newTarget;
+        curWait = 0;
+        SetWaitingBarColor(Colors.Green);
+        OnDoneWaiting = onDoneWaiting;
+    }
+
+    bool IsWaiting()
+    {
+        return curWait < waitTarget;
+    }
+
+    void SetWaitingBarColor(Color color)
+    {
+        waitForeground.Color = color;
+    }
+
+    void UpdateWaitingBar()
+    {
+        if (IsWaiting())
+        {
+            waitForeground.Size = new Vector2(waitBackground.Size.X * (float)(1 - curWait / waitTarget), waitBackground.Size.Y);
+            waitForeground.Position = new Vector2(0, 0);
+        }
+        else
+        {
+            waitForeground.Size = new Vector2(0, 0);
+        }
+    }
+
+    public override void _Process(double delta)
+    {
+        base._Process(delta);
+        if (IsWaiting())
+        {
+            curWait += delta;
+            UpdateWaitingBar();
+            if (!IsWaiting())
+                OnDoneWaiting?.Invoke();
+        }
+    }
+
 }

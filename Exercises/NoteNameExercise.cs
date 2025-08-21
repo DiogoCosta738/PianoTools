@@ -39,8 +39,8 @@ public partial class NoteNameExercise : NoteExerciseBase
         if (force) CloseInput();
         if (inputDlg is not null) return;
 
-        int minOctave = 3;
-        int maxOctave = 6;
+        int minOctave = HasOctave() ? 2 : -1;
+        int maxOctave = HasOctave() ? 6 : -1;
         inputDlg = DialogueFactory.Instance.GetNoteNameInputDialogue(HasSharp(), HasFlat(), minOctave, maxOctave, SubmitNote);
     }
 

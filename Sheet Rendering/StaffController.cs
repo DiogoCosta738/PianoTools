@@ -131,7 +131,7 @@ public partial class StaffController : Control
             {
                 if (include)
                 {
-                    (int noteNameIndex, int octave, string accidental) = SplitMidiNote(midiIndex);
+                    (int noteNameIndex, int octave, string accidental) = NoteUtils.SplitMidiNote(midiIndex);
                     extraLines.Add(GetNoteHeight(noteNameIndex, octave));
                 }
                 include ^= true;
@@ -165,30 +165,6 @@ public partial class StaffController : Control
         return lines;
     }
 
-    public static (int noteNameIndex, int octave, string accidental) SplitMidiNote(int midiIndex, bool preferFlat = false)
-    {
-        int octave = midiIndex < 0 ? 0 : midiIndex / 12;
-        int noteNameIndex = NoteUtils.SemitoneToTone(midiIndex % 12);
-        if (NoteUtils.HasAccidental(midiIndex))
-        {
-            if (preferFlat)
-            {
-                noteNameIndex--;
-                if (noteNameIndex < 0)
-                {
-                    octave--;
-                    noteNameIndex = 7;
-                }
-                return (noteNameIndex, octave, "b");
-            }
-            return (noteNameIndex, octave, "#");
-        }
-        else
-        {
-            return (noteNameIndex, octave, "");
-        }
-    }
-
     public void UpdateNote(int noteIndex, int idx, bool hideLabel = false, bool hideNote = false)
     {
         foreach (var partial in notePartialLines[idx])
@@ -217,7 +193,7 @@ public partial class StaffController : Control
         noteLabels[idx].Visible = !hideLabel;
         noteLabels[idx].Text = NoteUtils.GetNoteNameShort(noteIndex);
         noteTextures[idx].Visible = !hideNote;
-        (int noteNameIndex, int octave, string accidental) = SplitMidiNote(noteIndex);
+        (int noteNameIndex, int octave, string accidental) = NoteUtils.SplitMidiNote(noteIndex);
         GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));
 
         float xx = noteTextures[idx].Position.X;

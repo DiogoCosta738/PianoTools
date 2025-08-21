@@ -10,13 +10,37 @@ public static class NoteUtils
 	static bool[] noteAccidental = {
 		false, true, false, true, false, false, true, false, true, false, true, false
 	};
+    
+    public static (int noteNameIndex, int octave, string accidental) SplitMidiNote(int midiIndex, bool preferFlat = false)
+    {
+        int octave = midiIndex < 0 ? 0 : midiIndex / 12;
+        int noteNameIndex = NoteUtils.SemitoneToTone(midiIndex % 12);
+        if (NoteUtils.HasAccidental(midiIndex))
+        {
+            if (preferFlat)
+            {
+                noteNameIndex--;
+                if (noteNameIndex < 0)
+                {
+                    octave--;
+                    noteNameIndex = 7;
+                }
+                return (noteNameIndex, octave, "b");
+            }
+            return (noteNameIndex, octave, "#");
+        }
+        else
+        {
+            return (noteNameIndex, octave, "");
+        }
+    }
 
 	public static string GetNoteNameShort(int midiNote)
-	{
-		int octave = (midiNote) / 12;
-		int semitone = midiNote % 12;
-		return $"{noteShortName[semitone]}{octave}";
-	}
+    {
+        int octave = (midiNote) / 12;
+        int semitone = midiNote % 12;
+        return $"{noteShortName[semitone]}{octave}";
+    }
 	
 	public static bool HasAccidental(int midiNote)
 	{

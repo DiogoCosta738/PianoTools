@@ -45,11 +45,10 @@ script = ExtResource("4_3pot7")
 [node name="KeyboardController" type="Node" parent="."]
 script = ExtResource("4_1iknw")
 
-[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "pianoController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
+[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
 script = ExtResource("6_4vvoa")
 midiKeyboardController = NodePath("../MidiKeyboardController")
 staffController = NodePath("../CanvasLayer/StaffController")
-pianoController = NodePath("../CanvasLayer/PianoController")
 scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/Label")
 feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/RichTextLabel")
 startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/StartButton")
@@ -319,6 +318,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController")]
 script = ExtResource("4_kjjcl")

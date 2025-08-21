@@ -16,7 +16,7 @@ public partial class DialogueFactory : Node
         Instance = this;
     }
 
-    public NoteNameInput GetNoteNameInputDialogue(bool hasSharp, bool hasFlat, int minOctave, int maxOctave, Action<(int noteNameIndex, string accidental, int octave)> onNotePicked, Control parent = null)
+    public NoteNameInput GetNoteNameInputDialogue(bool hasSharp, bool hasFlat, int minOctave, int maxOctave, Action<Note> onNotePicked, Control parent = null)
     {
         NoteNameInput dlg = noteNameInputScene.Instantiate<NoteNameInput>();
         parent = parent is null ? dialogueContainer : parent;

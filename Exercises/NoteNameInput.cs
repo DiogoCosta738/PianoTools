@@ -24,7 +24,7 @@ public partial class NoteNameInput : Control
     int minOctave = 1, maxOctave = 8;
     int curMinOctave = 1, curMaxOctave = 8;
 
-    Action<(int noteNameIndex, string accidental, int octave)> OnSubmit;
+    Action<Note> OnSubmit;
 
     public override void _Ready()
     {
@@ -42,7 +42,8 @@ public partial class NoteNameInput : Control
                 Button btn = new Button();
                 buttonContainer.AddChild(btn);
                 btn.Text = notes[i] + accidental;
-                btn.Pressed += () => Submit(i, accidental);
+                int local_i = i;
+                btn.Pressed += () => Submit(local_i, accidental);
                 btn.CustomMinimumSize = new Vector2(75, 50);
                 list.Add(btn);
             }
@@ -91,10 +92,10 @@ public partial class NoteNameInput : Control
     void Submit(int note, string accidental)
     {
         int octave = Mathf.RoundToInt(octavesSlider.Value);
-        OnSubmit?.Invoke((note, accidental, octave));
+        OnSubmit?.Invoke(new Note(note, octave, accidental));
     }
 
-    public void Setup(bool hasSharp, bool hasFlat, int octaveMin, int octaveMax, Action<(int noteNameIndex, string accidental, int octave)> OnSubmit)
+    public void Setup(bool hasSharp, bool hasFlat, int octaveMin, int octaveMax, Action<Note> OnSubmit)
     {
         this.OnSubmit = OnSubmit;
         for (int i = 0; i < 7; i++)
@@ -117,7 +118,7 @@ public partial class NoteNameInput : Control
             for (int i = 0; i < 8; i++)
             {
                 bool inRange = (i + 1) >= octaveMin && (i + 1) <= octaveMax;
-                octaveLabels[i].Modulate = inRange ? Colors.White : Colors.Gray;
+                octaveLabels[i].Modulate = inRange ? Colors.White : Colors.DarkGray;
             }
             UpdateOctave(Mathf.RoundToInt(octavesSlider.Value));
         }

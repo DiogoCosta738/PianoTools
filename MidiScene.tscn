@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://dsjcitfq3sjeb"]
+[gd_scene load_steps=18 format=3 uid="uid://dsjcitfq3sjeb"]
 
 [ext_resource type="Script" uid="uid://bs8yxpuv705go" path="res://DialogueFactory.cs" id="1_5l2kn"]
 [ext_resource type="Script" uid="uid://cny5iv8sbjirt" path="res://MidiGame/MidiReader.cs" id="1_xsb4v"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://df2hst5nekh01" path="res://MidiGame/PianoUI/PianoUIController.cs" id="6_kesap"]
 [ext_resource type="Script" uid="uid://cj1y3yiafofum" path="res://MidiGame/SoundfontConfigUI.cs" id="7_04x8u"]
 [ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
+[ext_resource type="Script" uid="uid://dj77wha64q0wf" path="res://Exercises/NoteNameExercise.cs" id="9_sdowb"]
 [ext_resource type="Texture2D" uid="uid://dtsxcaa2mt2rb" path="res://Assets/pngwing.com.png" id="9_uqpa1"]
 [ext_resource type="Script" uid="uid://d3umuwkyvq60n" path="res://GenericUI/DraggablePanelContainer.cs" id="12_y4h0a"]
 
@@ -49,16 +50,32 @@ script = ExtResource("4_1iknw")
 script = ExtResource("6_4vvoa")
 midiKeyboardController = NodePath("../MidiKeyboardController")
 staffController = NodePath("../CanvasLayer/StaffController")
-scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/Label")
-feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/RichTextLabel")
-startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/StartButton")
-resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/ResetButton")
-useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/LabelCheck")
-useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SheetCheck")
-useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/SharpsCheck")
-useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/FlatsCheck")
-waitBackground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground")
-waitForeground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground/WaitForeground")
+scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/ScoreLabel")
+feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/FeedbackLabel")
+startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/StartButton")
+resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/ResetButton")
+useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/LabelCheck")
+useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/SheetCheck")
+useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/SharpsCheck")
+useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/FlatsCheck")
+waitBackground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/WaitBackground")
+waitForeground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/WaitBackground/WaitForeground")
+
+[node name="NoteNameExerciseController" type="Node" parent="." node_paths=PackedStringArray("openInputButton", "octavesCheck", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
+script = ExtResource("9_sdowb")
+openInputButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/InputMenuButton")
+octavesCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/OctavesCheck")
+staffController = NodePath("../CanvasLayer/StaffController")
+scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/ScoreLabel")
+feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/FeedbackLabel")
+startButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/StartButton")
+resetButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/ResetButton")
+useLabelCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/LabelCheck")
+useSheetCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/SheetCheck")
+useSharpsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/SharpsCheck")
+useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/FlatsCheck")
+waitBackground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/WaitBackground")
+waitForeground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/WaitBackground/WaitForeground")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -230,6 +247,7 @@ texture = ExtResource("9_uqpa1")
 expand_mode = 3
 
 [node name="NotePlayExerciseUI" type="PanelContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(300, 0)
 offset_left = 873.0
 offset_top = 32.0
 offset_right = 1093.0
@@ -245,68 +263,152 @@ layout_mode = 2
 script = ExtResource("12_y4h0a")
 parent = NodePath("../..")
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer"]
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer"]
+layout_mode = 2
+current_tab = 1
+
+[node name="Play note" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer"]
+[node name="Play note" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="FeedbackLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 bbcode_enabled = true
 text = "Standby"
 fit_content = true
 horizontal_alignment = 1
 
-[node name="WaitBackground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="WaitBackground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 color = Color(0.129412, 0.129412, 0.129412, 1)
 
-[node name="WaitForeground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer/WaitBackground"]
+[node name="WaitForeground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/WaitBackground"]
 layout_mode = 0
 
-[node name="Label" type="Label" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Score: 0 / 0 (100%)"
 
-[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 
-[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Use flats"
 
-[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Use sharps"
 
-[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 
-[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 button_pressed = true
 text = "Name note"
 
-[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 button_pressed = true
 text = "Render note
 "
 
-[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Start"
 
-[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/MarginContainer/VBoxContainer"]
+[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
+layout_mode = 2
+text = "Reset
+"
+
+[node name="Name note" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_tab_index = 1
+
+[node name="Name note" type="VBoxContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="FeedbackLabel" type="RichTextLabel" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Standby"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="WaitBackground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+color = Color(0.129412, 0.129412, 0.129412, 1)
+
+[node name="WaitForeground" type="ColorRect" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/WaitBackground"]
+layout_mode = 0
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Score: 0 / 0 (100%)"
+
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Use flats"
+
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Use sharps"
+
+[node name="OctavesCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Use octaves"
+
+[node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+
+[node name="InputMenuButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Open input menu"
+
+[node name="LabelCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+visible = false
+layout_mode = 2
+text = "Name note"
+
+[node name="SheetCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+visible = false
+layout_mode = 2
+button_pressed = true
+text = "Render note
+"
+
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+layout_mode = 2
+text = "Start"
+
+[node name="ResetButton" type="Button" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
 layout_mode = 2
 text = "Reset
 "

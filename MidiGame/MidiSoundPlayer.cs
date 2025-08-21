@@ -118,28 +118,33 @@ public partial class MidiSoundPlayer : Node
 		_channel = channel;
 	}
 
-	public void PlayNote(int note, int velocity = 100)
+	public void PlayNote(int midiNote, int velocity = 100)
 	{
-		GD.Print("Note on: ", note, " ", velocity);
-		_player.PlayNote(_channel, note, velocity);
-		pianoController.NoteOn(note);
+		GD.Print("Note on: ", midiNote, " ", velocity);
+		_player.PlayNote(_channel, midiNote, velocity);
+		pianoController.NoteOn(midiNote);
 
-		if (notesDown.Contains(note)) notesDown.Remove(note);
-		notesDown.Add(note);
+		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
+		notesDown.Add(midiNote);
 
-		staffController.CallDeferred("UpdateNote", note);
+		Note note = NoteUtils.FromMidiNote(midiNote);
+		staffController.CallDeferred("UpdateNote", note.GetNoteLetterIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
-	public void StopNote(int note)
+	public void StopNote(int midiNote)
 	{
-		GD.Print("Note off: ", note);
-		_player.StopNote(_channel, note);
-		pianoController.NoteOff(note);
+		GD.Print("Note off: ", midiNote);
+		_player.StopNote(_channel, midiNote);
+		pianoController.NoteOff(midiNote);
 
-		if (notesDown.Contains(note)) notesDown.Remove(note);
-		int nextNote = -1;
-		if (notesDown.Count != 0) nextNote = notesDown[notesDown.Count - 1];
-		staffController.CallDeferred("UpdateNote", nextNote);
+		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
+		int nextMidiNote = -1;
+		if (notesDown.Count != 0) nextMidiNote = notesDown[notesDown.Count - 1];
+		Note note = NoteUtils.FromMidiNote(nextMidiNote);
+		if (note is not null)
+			staffController.CallDeferred("UpdateNote", note.GetNoteLetterIndex(), note.GetOctave(), note.GetAccidental());
+		else
+			staffController.CallDeferred("UpdateNote");
 	}
 
 	public void SetVolume(int vol)

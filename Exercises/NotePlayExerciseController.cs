@@ -11,10 +11,10 @@ public partial class NotePlayExerciseController : NoteExerciseBase
     public override void _Ready()
     {
         base._Ready();
-        midiKeyboardController.OnNoteDown += (note, vel) => CallDeferred("PlayedNote", note);
+        midiKeyboardController.OnNoteDown += (note, vel) => CallDeferred("SubmitNote", note);
     }
 
-    protected override int GenerateNote()
+    protected override Note GenerateNote()
     {
         int noteMin = 24;
         int noteMax = 72;
@@ -26,6 +26,6 @@ public partial class NotePlayExerciseController : NoteExerciseBase
             if (NoteUtils.HasAccidental(newNote) && !useSharpsCheck.ButtonPressed && !useFlatsCheck.ButtonPressed)
                 newNote = -1;
         }
-        return newNote;
+        return NoteUtils.FromMidiNote(newNote);
     }
 }

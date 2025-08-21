@@ -4,6 +4,55 @@ using NAudio.Midi;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 
+public class Note
+{
+    int noteLetterIndex = 0; // C
+    int octave = 4;
+    string accidental = "";
+
+    public Note(int letterIndex, int oct, string acc)
+    {
+        noteLetterIndex = letterIndex;
+        octave = oct;
+        accidental = acc;
+    }
+
+    public string GetNameShort()
+    {
+        return GetNoteLetter() + accidental + octave.ToString();
+    }
+
+    public bool HasAccidental()
+    {
+        return accidental != "";
+    }
+
+    public int GetNoteLetterIndex()
+    {
+        return noteLetterIndex;
+    }
+
+    public char GetNoteLetter()
+    {
+        return NoteUtils.GetNoteLetter(noteLetterIndex);
+    }
+
+    public int GetOctave()
+    {
+        return octave;
+    }
+
+    public string GetAccidental()
+    {
+        return accidental;
+    }
+
+    public int ToMidiNote()
+    {
+        return NoteUtils.ToMidiNote(this);
+    }
+}
+
 public partial class NoteExerciseBase : Node
 {
     [Export] StaffController staffController;
@@ -13,7 +62,7 @@ public partial class NoteExerciseBase : Node
     [Export] protected CheckBox useLabelCheck, useSheetCheck, useSharpsCheck, useFlatsCheck;
     [Export] protected ColorRect waitBackground, waitForeground;
 
-    protected int waitingNote;
+    protected Note waitingNote;
     protected int correct = 0;
     protected int total = 0;
 
@@ -25,10 +74,10 @@ public partial class NoteExerciseBase : Node
 
     Action OnDoneWaiting;
 
-    protected  bool HasSharp() { return useSharpsCheck.ButtonPressed; }
-    protected  bool HasFlat() { return useFlatsCheck.ButtonPressed; }
-    protected  bool RenderName() { return useLabelCheck.ButtonPressed; }
-    protected  bool RenderNote() { return useSheetCheck.ButtonPressed; }
+    protected bool HasSharp() { return useSharpsCheck.ButtonPressed; }
+    protected bool HasFlat() { return useFlatsCheck.ButtonPressed; }
+    protected bool RenderName() { return useLabelCheck.ButtonPressed; }
+    protected bool RenderNote() { return useSheetCheck.ButtonPressed; }
 
     public override void _Ready()
     {
@@ -41,10 +90,10 @@ public partial class NoteExerciseBase : Node
 
     protected virtual void Reset()
     {
-        waitingNote = -1;
+        waitingNote = null;
         ResetScore();
         ResetWaiting();
-        SetFeedback("Stand-by");   
+        SetFeedback("Stand-by");
     }
 
     void ResetScore()
@@ -55,21 +104,21 @@ public partial class NoteExerciseBase : Node
     }
 
     protected virtual void Start()
-    { 
+    {
         startButton.Text = "Stop";
         PickNewNote();
     }
 
     protected virtual void Stop()
-    { 
-        waitingNote = -1;
+    {
+        waitingNote = null;
         startButton.Text = "Start";
     }
 
 
     void StartStop()
     {
-        if (waitingNote >= 0)
+        if (waitingNote is not null)
         {
             Stop();
         }
@@ -79,7 +128,7 @@ public partial class NoteExerciseBase : Node
         }
     }
 
-    protected virtual int GenerateNote()
+    protected virtual Note GenerateNote()
     {
         int noteMin = 24;
         int noteMax = 72;
@@ -93,14 +142,13 @@ public partial class NoteExerciseBase : Node
                 newNote = -1;
             }
         }
-        return newNote;
+        return NoteUtils.FromMidiNote(newNote, false);
     }
 
     void PickNewNote()
     {
-        int newNote = GenerateNote();
-        waitingNote = newNote;
-        staffController.UpdateNote(newNote, 0, !useLabelCheck.ButtonPressed, !useSheetCheck.ButtonPressed);
+        waitingNote = GenerateNote();
+        staffController.UpdateNote(waitingNote, 0, !useLabelCheck.ButtonPressed, !useSheetCheck.ButtonPressed);
         SetFeedback("Play note!");
     }
 
@@ -109,10 +157,25 @@ public partial class NoteExerciseBase : Node
         scoreLabel.Text = String.Format("Score: {0} / {1} ({2}%)", correct.ToString(), total.ToString(), total == 0 ? 100 : (correct + 0.0f) / total);
     }
 
-    public void SubmitNote(int noteIndex)
+    protected virtual bool MatchesWaitingNote(Note note)
     {
-        if (waitingNote < 0 || IsWaiting()) return;
-        if (noteIndex == waitingNote)
+        return note.ToMidiNote() == waitingNote.ToMidiNote();
+    }
+
+    public void SubmitNote(int midiNote)
+    {
+        SubmitNote(NoteUtils.FromMidiNote(midiNote));
+    }
+
+    public void SubmitNote(int noteLetterIndex, int octave, string accidental)
+    {
+        SubmitNote(noteLetterIndex, octave, accidental);
+    }
+
+    public void SubmitNote(Note note)
+    {
+        if (waitingNote is null || IsWaiting()) return;
+        if (MatchesWaitingNote(note))
         {
             SetFeedback("[color=green]Great![/color]");
             correct++;
@@ -135,7 +198,7 @@ public partial class NoteExerciseBase : Node
     }
 
     void ResetWaiting()
-    { 
+    {
         curWait = 0;
         waitTarget = 0;
         UpdateWaitingBar();

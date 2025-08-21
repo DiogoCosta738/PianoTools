@@ -110,9 +110,19 @@ public partial class StaffController : Control
         return 0;
     }
 
-    public void UpdateNote(int noteIndex)
+    public void UpdateNote(int noteLetterIndex, int octave, string accidental)
+    { 
+        UpdateNote(new Note(noteLetterIndex, octave, accidental), 1);
+    }
+
+    public void UpdateNote()
     {
-        UpdateNote(noteIndex, 1);
+        UpdateNote(null, 1);
+    }
+
+    public void UpdateNote(Note note)
+    {
+        UpdateNote(note, 1);
     }
 
     const int A5 = 69; // first (lowest) note requiring ledger line above treble staff
@@ -120,7 +130,7 @@ public partial class StaffController : Control
     const int C4 = 48; // first (highest) note requiring ledger line below treble staff and first (lowest) above bass staff
 
     // as a list of y positions
-    List<float> GetPartialLinesRequired(int noteIndex)
+    List<float> GetPartialLinesRequired(int midiIndex)
     {
         List<float> lines = new List<float>();
         void local_handle_semitone(int midiIndex, ref bool include, List<float> extraLines)
@@ -131,41 +141,41 @@ public partial class StaffController : Control
             {
                 if (include)
                 {
-                    (int noteNameIndex, int octave, string accidental) = NoteUtils.SplitMidiNote(midiIndex);
-                    extraLines.Add(GetNoteHeight(noteNameIndex, octave));
+                    Note note = NoteUtils.FromMidiNote(midiIndex);
+                    extraLines.Add(GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()));
                 }
                 include ^= true;
             }
         }
         bool include = true;
-        if ((staffType == StaffType.Treble || staffType == StaffType.Grand) && noteIndex >= A5)
+        if ((staffType == StaffType.Treble || staffType == StaffType.Grand) && midiIndex >= A5)
         {
-            for (int i = A5; i <= noteIndex; i++)
+            for (int i = A5; i <= midiIndex; i++)
                 local_handle_semitone(i, ref include, lines);
         }
-        else if ((staffType == StaffType.Bass || staffType == StaffType.Grand) && noteIndex <= E2)
+        else if ((staffType == StaffType.Bass || staffType == StaffType.Grand) && midiIndex <= E2)
         {
-            for (int i = E2; i >= noteIndex; i--)
+            for (int i = E2; i >= midiIndex; i--)
                 local_handle_semitone(i, ref include, lines);
         }
-        else if (staffType == StaffType.Treble && noteIndex <= C4)
+        else if (staffType == StaffType.Treble && midiIndex <= C4)
         {
-            for (int i = C4; i >= noteIndex; i--)
+            for (int i = C4; i >= midiIndex; i--)
                 local_handle_semitone(i, ref include, lines);
         }
-        else if (staffType == StaffType.Bass && noteIndex >= C4)
+        else if (staffType == StaffType.Bass && midiIndex >= C4)
         {
-            for (int i = C4; i <= noteIndex; i++)
+            for (int i = C4; i <= midiIndex; i++)
                 local_handle_semitone(i, ref include, lines);
         }
-        else if (staffType == StaffType.Grand && noteIndex == C4)
+        else if (staffType == StaffType.Grand && midiIndex == C4)
         {
             return new List<float>() { GetNoteHeight(0, 4) };
         }
         return lines;
     }
 
-    public void UpdateNote(int noteIndex, int idx, bool hideLabel = false, bool hideNote = false)
+    public void UpdateNote(Note note, int idx, bool hideLabel = false, bool hideNote = false)
     {
         foreach (var partial in notePartialLines[idx])
         {
@@ -173,14 +183,14 @@ public partial class StaffController : Control
         }
         notePartialLines[idx].Clear();
 
-        if (noteIndex == -1)
+        if (note is null)
         {
             noteLabels[idx].Visible = false;
             noteTextures[idx].Visible = false;
             return;
         }
 
-        List<float> extraLines = GetPartialLinesRequired(noteIndex);
+        List<float> extraLines = GetPartialLinesRequired(note.ToMidiNote());
         if (extraLines is not null)
         {
             foreach (float y in extraLines)
@@ -191,13 +201,13 @@ public partial class StaffController : Control
         }
 
         noteLabels[idx].Visible = !hideLabel;
-        noteLabels[idx].Text = NoteUtils.GetNoteNameShort(noteIndex);
+        noteLabels[idx].Text = note.GetNameShort();
         noteTextures[idx].Visible = !hideNote;
-        (int noteNameIndex, int octave, string accidental) = NoteUtils.SplitMidiNote(noteIndex);
-        GD.Print("Note index: ", noteIndex, " Note name index: ", noteNameIndex, " Octave: ", octave, "Height: ", GetNoteHeight(noteNameIndex, octave));
+
+        GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetNoteLetterIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()));
 
         float xx = noteTextures[idx].Position.X;
-        float yy = GetNoteHeight(noteNameIndex, octave) - noteTextures[idx].Size.Y / 2;
+        float yy = GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()) - noteTextures[idx].Size.Y / 2;
 
         noteTextures[idx].Position = new Vector2(xx, yy);
     }

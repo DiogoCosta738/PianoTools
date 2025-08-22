@@ -60,6 +60,7 @@ public class Note
     public bool HasAccidental() { return accidental != ""; }
 
     public string GetAccidental() { return accidental; }
+    public void SetAccidental(string accidental) { this.accidental = accidental; }
 
     public int ToMidiNote() { return NoteUtils.ToMidiNote(this); }
 }

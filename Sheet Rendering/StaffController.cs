@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
 
 public enum StaffType
 {
@@ -14,16 +15,22 @@ public partial class StaffController : Control
 {
     [Export] Control notesContainer;
     [Export] Control labelsContainer;
-    [Export] TextureRect noteTexture;
+    [Export] NoteHeadUI noteHeadTemplate;
     [Export] Label noteLabel;
+    [Export] TextureRect trebleClef, bassClef;
 
     List<ColorRect> staffLines;
 
-    List<TextureRect> noteTextures;
+    List<NoteHeadUI> noteHeads;
     List<Label> noteLabels;
     List<List<ColorRect>> notePartialLines;
 
     List<int> notesDown;
+
+    const float TreblePivotX = 1; // 14.0f / 24;
+    const float TreblePivotY = 35f / 54;
+    const float BassPivotX = 1; // 24.5f / 49;
+    const float BassPivotY = 9.5f / 29;
 
     const float thickness = 4; // thickness of a sheet line
     const float spacing = 20; // distance between two sheet lines
@@ -65,6 +72,14 @@ public partial class StaffController : Control
         }
     }
 
+    const int NOTE_C = 0;
+    const int NOTE_D = 1;
+    const int NOTE_E = 2;
+    const int NOTE_F = 3;
+    const int NOTE_G = 4;
+    const int NOTE_A = 5;
+    const int NOTE_B = 6;
+
     public void BuildStaff()
     {
         staffLines = new List<ColorRect>();
@@ -78,12 +93,22 @@ public partial class StaffController : Control
         if (staffType == StaffType.Grand)
         {
             AddStaff(secondStaffTopMargin);
-
-            // height += 3 * spacing; // spacing in between staves
             height += spacing * 5; // staff height
             height += 2 * spacing; // more room at the bottom
         }
         notesContainer.CustomMinimumSize = new Vector2(GetSheetWidth(), height);
+
+        trebleClef.Visible = staffType == StaffType.Treble || staffType == StaffType.Grand;
+        bassClef.Visible = staffType == StaffType.Bass || staffType == StaffType.Grand;
+
+        float offsetX = Mathf.Max(trebleClef.Size.X * trebleClef.Scale.X, bassClef.Size.X * bassClef.Scale.X);
+        trebleClef.Position = new Vector2(
+            offsetX - trebleClef.Size.X * TreblePivotX * trebleClef.Scale.X,
+            GetNoteHeight(NOTE_G, 4) - trebleClef.Size.Y * trebleClef.Scale.Y * TreblePivotY);
+
+        bassClef.Position = new Vector2(
+            offsetX - bassClef.Size.X * BassPivotX * bassClef.Scale.X,
+            GetNoteHeight(NOTE_F, 3) - bassClef.Size.Y * bassClef.Scale.Y * BassPivotY);
     }
 
     public float GetNoteHeight(int noteTone, int octave)
@@ -111,7 +136,7 @@ public partial class StaffController : Control
     }
 
     public void UpdateNote(int noteTone, int octave, string accidental)
-    { 
+    {
         UpdateNote(new Note(noteTone, octave, accidental), 1);
     }
 
@@ -130,8 +155,13 @@ public partial class StaffController : Control
     const int C4 = 48; // first (highest) note requiring ledger line below treble staff and first (lowest) above bass staff
 
     // as a list of y positions
-    List<float> GetPartialLinesRequired(int midiIndex)
+    List<float> GetPartialLinesRequired(Note note)
     {
+        // the trick here is to ignore the accidental and use pure tone logic (it's the note that determines the height, accidentals are irrelevant and only confound)
+        note = note.Clone();
+        note.SetAccidental("");
+        int midiIndex = note.ToMidiNote();
+
         List<float> lines = new List<float>();
         void local_handle_semitone(int midiIndex, ref bool include, List<float> extraLines)
         {
@@ -178,43 +208,44 @@ public partial class StaffController : Control
     public void UpdateNote(Note note, int idx, bool hideLabel = false, bool hideNote = false)
     {
         foreach (var partial in notePartialLines[idx])
-        {
-            partial.QueueFree();
-        }
+            {
+                partial.QueueFree();
+            }
         notePartialLines[idx].Clear();
 
         if (note is null)
         {
             noteLabels[idx].Visible = false;
-            noteTextures[idx].Visible = false;
+            noteHeads[idx].Visible = false;
             return;
         }
 
-        List<float> extraLines = GetPartialLinesRequired(note.ToMidiNote());
+        List<float> extraLines = GetPartialLinesRequired(note);
         if (extraLines is not null)
         {
             foreach (float y in extraLines)
             {
-                ColorRect line = CreateLine(GetNoteCenterX(idx), y, columnWidth / 2);
+                ColorRect line = CreateLine(GetNoteCenterX(idx), y, columnWidth / 3);
                 notePartialLines[idx].Add(line);
             }
         }
 
         noteLabels[idx].Visible = !hideLabel;
         noteLabels[idx].Text = note.GetNameShort();
-        noteTextures[idx].Visible = !hideNote;
+        noteHeads[idx].Visible = !hideNote;
+        noteHeads[idx].Setup(note);
 
         GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetToneIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
 
-        float xx = noteTextures[idx].Position.X;
-        float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - noteTextures[idx].Size.Y / 2;
+        float xx = GetNoteCenterX(idx) - noteHeads[idx].Size.X / 2;
+        float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - noteHeads[idx].Size.Y / 2;
 
-        noteTextures[idx].Position = new Vector2(xx, yy);
+        noteHeads[idx].Position = new Vector2(xx, yy);
     }
 
     public float GetNoteCenterX(int index)
     {
-        return leftMargin + columnWidth / 2  + columnWidth * index;
+        return leftMargin + columnWidth / 2 + columnWidth * index;
     }
 
     float GetSheetWidth()
@@ -227,27 +258,27 @@ public partial class StaffController : Control
         base._Ready();
 
         noteLabels = new List<Label>();
-        noteTextures = new List<TextureRect>();
+        noteHeads = new List<NoteHeadUI>();
         notePartialLines = new List<List<ColorRect>>();
 
         noteLabels.Add(noteLabel);
-        noteTextures.Add(noteTexture);
+        noteHeads.Add(noteHeadTemplate);
         notePartialLines.Add(new List<ColorRect>());
 
         for (int i = 1; i < columnCount; i++)
         {
             noteLabels.Add((Label)noteLabel.Duplicate());
-            noteTextures.Add((TextureRect)noteTexture.Duplicate());
+            noteHeads.Add((NoteHeadUI)noteHeadTemplate.Duplicate());
             notePartialLines.Add(new List<ColorRect>());
 
             labelsContainer.AddChild(noteLabels[i]);
-            notesContainer.AddChild(noteTextures[i]);
+            notesContainer.AddChild(noteHeads[i]);
         }
 
         for (int i = 0; i < noteLabels.Count; i++)
         {
             noteLabels[i].Position = new Vector2(GetNoteCenterX(i) - noteLabel.Size.X / 2, noteLabel.Position.Y);
-            noteTextures[i].Position = new Vector2(GetNoteCenterX(i) - noteTexture.Size.X / 2, noteTexture.Position.Y);
+            noteHeads[i].Position = new Vector2(GetNoteCenterX(i) - noteHeadTemplate.Size.X / 2, noteHeadTemplate.Position.Y);
         }
         BuildStaff();
     }

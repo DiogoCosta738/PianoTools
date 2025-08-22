@@ -281,6 +281,9 @@ public partial class StaffController : Control
             noteHeads[i].Position = new Vector2(GetNoteCenterX(i) - noteHeadTemplate.Size.X / 2, noteHeadTemplate.Position.Y);
         }
         BuildStaff();
+
+        for (int i = 0; i < noteLabels.Count; i++)
+            UpdateNote(null, i);
     }
 
 }

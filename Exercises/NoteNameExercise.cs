@@ -24,7 +24,7 @@ public partial class NoteNameExercise : NoteExerciseBase
         { 
             match &= waitingNote.GetOctave() == note.GetOctave();
         }
-        return match && note.GetNoteLetterIndex() == waitingNote.GetNoteLetterIndex();
+        return match && note.GetToneIndex() == waitingNote.GetToneIndex();
     }
 
     void CloseInput()

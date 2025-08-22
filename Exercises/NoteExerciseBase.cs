@@ -6,20 +6,45 @@ using System.Threading;
 
 public class Note
 {
-    int noteLetterIndex = 0; // C
-    int octave = 4;
-    string accidental = "";
+    protected int noteTone = 0; // C
+    protected int octave = 4;
+    protected string accidental = "";
 
-    public Note(int letterIndex, int oct, string acc)
+    public Note(int tone, int oct, string acc)
     {
-        noteLetterIndex = letterIndex;
+        noteTone = tone;
         octave = oct;
         accidental = acc;
     }
+    
+    // !TODO: I may want a different Equals method that compares either the sound or the notation
+    public override bool Equals(object obj)
+    {
+        if (obj is Note otherNote)
+            return noteTone == otherNote.noteTone && octave == otherNote.octave && accidental == otherNote.accidental;
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(noteTone, octave, accidental);
+    }
+
+    public static bool operator ==(Note left, Note right)
+    {
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left is null || right is null)
+            return false;
+        return left.Equals(right);
+    }
+
+    // Inequality operator
+    public static bool operator !=(Note left, Note right) => !(left == right);
 
     public string GetNameShort()
     {
-        return GetNoteLetter() + accidental + octave.ToString();
+        return GetToneLetter() + accidental + octave.ToString();
     }
 
     public bool HasAccidental()
@@ -27,14 +52,14 @@ public class Note
         return accidental != "";
     }
 
-    public int GetNoteLetterIndex()
+    public int GetToneIndex()
     {
-        return noteLetterIndex;
+        return noteTone;
     }
 
-    public char GetNoteLetter()
+    public char GetToneLetter()
     {
-        return NoteUtils.GetNoteLetter(noteLetterIndex);
+        return NoteUtils.GetToneLetter(noteTone);
     }
 
     public int GetOctave()
@@ -167,9 +192,9 @@ public partial class NoteExerciseBase : Node
         SubmitNote(NoteUtils.FromMidiNote(midiNote));
     }
 
-    public void SubmitNote(int noteLetterIndex, int octave, string accidental)
+    public void SubmitNote(int noteTone, int octave, string accidental)
     {
-        SubmitNote(noteLetterIndex, octave, accidental);
+        SubmitNote(noteTone, octave, accidental);
     }
 
     public void SubmitNote(Note note)

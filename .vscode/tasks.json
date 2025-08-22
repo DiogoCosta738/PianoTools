@@ -13,6 +13,20 @@
                 "-q"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build1",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

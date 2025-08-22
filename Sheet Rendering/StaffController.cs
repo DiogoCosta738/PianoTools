@@ -86,33 +86,33 @@ public partial class StaffController : Control
         notesContainer.CustomMinimumSize = new Vector2(GetSheetWidth(), height);
     }
 
-    public float GetNoteHeight(int noteNameIndex, int octave)
+    public float GetNoteHeight(int noteTone, int octave)
     {
         float firstStaffHeight = spacing / 2;
         float secondStaffHeight = spacing * 3 + spacing * 5 + spacing / 2; // the first note c4 is where?
         switch (staffType)
         {
             case StaffType.Treble:
-                return firstStaffHeight - spacing / 2 * noteNameIndex - spacing / 2 * 7 * (octave - 6);
+                return firstStaffHeight - spacing / 2 * noteTone - spacing / 2 * 7 * (octave - 6);
             case StaffType.Bass:
-                // E4 is two lines above, which is noteNameIndex 2
-                return firstStaffHeight - spacing / 2 * (noteNameIndex - 2) - spacing / 2 * 7 * (octave - 4);
+                // E4 is two lines above, which is noteTone 2
+                return firstStaffHeight - spacing / 2 * (noteTone - 2) - spacing / 2 * 7 * (octave - 4);
             case StaffType.Grand:
                 if (octave >= 4)
                 {
-                    return firstStaffHeight - spacing / 2 * noteNameIndex - spacing / 2 * 7 * (octave - 6);
+                    return firstStaffHeight - spacing / 2 * noteTone - spacing / 2 * 7 * (octave - 6);
                 }
                 else
                 {
-                    return secondStaffHeight - spacing / 2 * noteNameIndex - spacing / 2 * 7 * (octave - 4);
+                    return secondStaffHeight - spacing / 2 * noteTone - spacing / 2 * 7 * (octave - 4);
                 }
         }
         return 0;
     }
 
-    public void UpdateNote(int noteLetterIndex, int octave, string accidental)
+    public void UpdateNote(int noteTone, int octave, string accidental)
     { 
-        UpdateNote(new Note(noteLetterIndex, octave, accidental), 1);
+        UpdateNote(new Note(noteTone, octave, accidental), 1);
     }
 
     public void UpdateNote()
@@ -142,7 +142,7 @@ public partial class StaffController : Control
                 if (include)
                 {
                     Note note = NoteUtils.FromMidiNote(midiIndex);
-                    extraLines.Add(GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()));
+                    extraLines.Add(GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
                 }
                 include ^= true;
             }
@@ -204,10 +204,10 @@ public partial class StaffController : Control
         noteLabels[idx].Text = note.GetNameShort();
         noteTextures[idx].Visible = !hideNote;
 
-        GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetNoteLetterIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()));
+        GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetToneIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
 
         float xx = noteTextures[idx].Position.X;
-        float yy = GetNoteHeight(note.GetNoteLetterIndex(), note.GetOctave()) - noteTextures[idx].Size.Y / 2;
+        float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - noteTextures[idx].Size.Y / 2;
 
         noteTextures[idx].Position = new Vector2(xx, yy);
     }
@@ -225,6 +225,8 @@ public partial class StaffController : Control
     public override void _Ready()
     {
         base._Ready();
+
+        NoteUtils.TestNotes();
 
         noteLabels = new List<Label>();
         noteTextures = new List<TextureRect>();

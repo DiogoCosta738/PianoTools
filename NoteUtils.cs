@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public static class NoteUtils
 {
@@ -10,7 +11,7 @@ public static class NoteUtils
         "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
     };
 
-    static Dictionary<string, int> noteShortNameToIndex = new Dictionary<string, int>()
+    static Dictionary<string, int> noteShortNameToSemitone = new Dictionary<string, int>()
     {
        { "C", 0 },
        { "C#", 1 },
@@ -23,10 +24,10 @@ public static class NoteUtils
        { "Eb", 3 },
        { "F", 5 },
        { "F#", 6 },
-       { "Fb", 5 },
+       { "Fb", 4 },
        { "G", 7 },
        { "G#", 8 },
-       { "Gb", 7 },
+       { "Gb", 6 },
        { "A", 9 },
        { "A#", 10 },
        { "Ab", 8 },
@@ -35,19 +36,45 @@ public static class NoteUtils
        { "Bb", 10 },
     };
 
-	static bool[] noteAccidental = {
+    static Dictionary<string, (string shortName, int octaveShift)> flatEquivalent = new Dictionary<string, (string shortName, int octaveShift)>()
+    {
+       // { "C", "" },
+       { "C#", ("Db", 0) },
+       // { "Cb", "B" },
+       // { "D", "" },
+       { "D#", ("Eb", 0) },
+       // { "Db", "C#" },
+       { "E", ("Fb", 0) },
+       // { "E#", "F" },
+       // { "Eb", "D#" },
+       // { "F", "E#" },
+       { "F#", ("Gb", 0) },
+       // { "Fb", "E" },
+       // { "G", "" },
+       { "G#", ("Ab", 0) },
+       // { "Gb", "F#" },
+       // { "A", "" },
+       { "A#", ("Bb", 0) },
+       // { "Ab", "G#" },
+       { "B", ("Cb", 1) },
+       // { "B#", "C" },
+       // { "Bb", "A#" },
+    };
+
+    static bool[] noteAccidental = {
         false, true, false, true, false, false, true, false, true, false, true, false
     };
 
-    public static char GetNoteLetter(int idx)
+    public static char GetToneLetter(int tone)
     {
-        return noteLetters[idx];
+        return noteLetters[tone];
     }
 
     public static int ToMidiNote(Note note)
     {
         int oct = note.GetOctave();
-        int baseIndex = noteShortNameToIndex[note.GetNoteLetter() + note.GetAccidental()];
+        int baseIndex = noteShortNameToSemitone[note.GetToneLetter() + note.GetAccidental()];
+        if (note.GetToneLetter() == 'C' && note.GetAccidental() == "b") oct--;
         return baseIndex + 12 * oct;
     }
 
@@ -56,28 +83,26 @@ public static class NoteUtils
         if (midiIndex < 0) return null;
 
         int octave = midiIndex < 0 ? 0 : midiIndex / 12;
-        int noteNameIndex = NoteUtils.SemitoneToTone(midiIndex % 12);
-        if (NoteUtils.HasAccidental(midiIndex))
+        int semitone = midiIndex % 12;
+        int noteTone = NoteUtils.SemitoneToTone(semitone);
+        string shortName = noteShortName[semitone];
+        if (preferFlat && flatEquivalent.ContainsKey(shortName))
         {
-            if (preferFlat)
-            {
-                noteNameIndex--;
-                if (noteNameIndex < 0)
-                {
-                    octave--;
-                    noteNameIndex = 7;
-                }
-                return new Note(noteNameIndex, octave, "b");
-            }
-            return new Note(noteNameIndex, octave, "#");
+            (string flatShortName, int octaveShift) = flatEquivalent[shortName];
+            octave += octaveShift;
+            return new Note((noteTone + 1) % 7, octave, "b");
+        }
+        else if (NoteUtils.HasAccidental(midiIndex))
+        {
+            return new Note(noteTone, octave, "#");
         }
         else
         {
-            return new Note(noteNameIndex, octave, "");
+            return new Note(noteTone, octave, "");
         }
     }
 
-	public static string GetNoteNameShort(int midiNote)
+    public static string GetNoteNameShort(int midiNote)
     {
         if (midiNote < 0) return "N/A";
 
@@ -85,15 +110,15 @@ public static class NoteUtils
         int semitone = midiNote % 12;
         return $"{noteShortName[semitone]}{octave}";
     }
-	
-	public static bool HasAccidental(int midiNote)
-	{
+
+    public static bool HasAccidental(int midiNote)
+    {
         if (midiNote < 0) return false;
 
-		int octave = (midiNote) / 12;
-		int semitone = midiNote % 12;
-		return noteAccidental[semitone];
-	}
+        int octave = (midiNote) / 12;
+        int semitone = midiNote % 12;
+        return noteAccidental[semitone];
+    }
 
     // from 0-11 to 0-6
     public static int SemitoneToTone(int semitone, bool preferFlat)
@@ -129,5 +154,44 @@ public static class NoteUtils
                 return 6; // b
         }
         return -1;
+    }
+
+    public static void TestNotes()
+    {
+        string[] accidentals = new string[] { "", "#", "b"};
+        for (int oct = 1; oct <= 8; oct++)
+        {
+            for (int noteTone = 0; noteTone < noteLetters.Length; noteTone++)
+            {
+                foreach (var acc in accidentals)
+                {
+                    Note note = new Note(noteTone, oct, acc);
+                    int midiNote = note.ToMidiNote();
+
+                    Note noteSharp = NoteUtils.FromMidiNote(midiNote, preferFlat: false);
+                    Note noteFlat = NoteUtils.FromMidiNote(midiNote, preferFlat: true);
+
+                    int midiNoteSharp = noteSharp.ToMidiNote();
+                    int midiNoteFlat = noteFlat.ToMidiNote();
+
+                    // avoid the cumbersome accidental tests because of things like E# which is actually F
+                    // maybe revisit the whole conversion later so make it exhaustive, meaning every note knows its forced sharp, flat, and whether it is "acceptable"
+                    bool test1 = midiNote == midiNoteSharp;
+                    bool test2 = midiNote == midiNoteFlat;
+                    bool test3 = midiNoteSharp == midiNoteFlat;
+                    /*
+                    bool eq1 = note == noteSharp;
+                    bool eq2 = note == noteFlat;
+                    bool test4 = acc != "#" || eq1;
+                    bool test5 = acc != "b" || eq2;
+                    Debug.Assert(test1 && test2 && test3 && test4 && test5);
+                    */
+                    if (!(test1 && test2 && test3 /*&& test4 && test5*/))
+                    {
+                        GD.Print("ERROR: ", note.GetNameShort());
+                    }
+                }
+            }
+        }
     }
 }

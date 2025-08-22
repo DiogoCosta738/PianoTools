@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Threading;
 
 public partial class NoteNameExercise : NoteExerciseBase
 {
@@ -26,6 +27,24 @@ public partial class NoteNameExercise : NoteExerciseBase
         }
         return match && note.GetToneIndex() == waitingNote.GetToneIndex();
     }
+
+    void AddFeedbackNote(Note note, int durationMs)
+    {
+        note = note.Clone();
+        if (!HasOctave())
+            note.SetOctave(waitingNote is not null ? waitingNote.GetOctave() : 5);
+        staffController.UpdateNote(note);
+        Thread thread = new Thread(() =>
+        {
+            Thread.Sleep(durationMs);
+            staffController.CallDeferred("UpdateNote");
+        });
+        thread.Start();
+    }
+
+    public override void OnCorrectNote(Note note) { AddFeedbackNote(note, Mathf.RoundToInt(correctWaitSeconds * 1000)); }
+
+    public override void OnWrongNote(Note note) { AddFeedbackNote(note, Mathf.RoundToInt(wrongWaitSeconds * 1000)); }
 
     void CloseInput()
     {

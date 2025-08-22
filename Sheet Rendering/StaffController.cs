@@ -226,8 +226,6 @@ public partial class StaffController : Control
     {
         base._Ready();
 
-        NoteUtils.TestNotes();
-
         noteLabels = new List<Label>();
         noteTextures = new List<TextureRect>();
         notePartialLines = new List<List<ColorRect>>();

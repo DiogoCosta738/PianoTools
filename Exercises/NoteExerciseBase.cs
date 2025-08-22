@@ -16,6 +16,11 @@ public class Note
         octave = oct;
         accidental = acc;
     }
+
+    public Note Clone()
+    {
+        return new Note(noteTone, octave, accidental);
+    }
     
     // !TODO: I may want a different Equals method that compares either the sound or the notation
     public override bool Equals(object obj)
@@ -42,45 +47,26 @@ public class Note
     // Inequality operator
     public static bool operator !=(Note left, Note right) => !(left == right);
 
-    public string GetNameShort()
-    {
-        return GetToneLetter() + accidental + octave.ToString();
-    }
+    public string GetNameShort() { return GetToneLetter() + accidental + octave.ToString(); }
 
-    public bool HasAccidental()
-    {
-        return accidental != "";
-    }
+    public int GetToneIndex() { return noteTone; }
 
-    public int GetToneIndex()
-    {
-        return noteTone;
-    }
+    public char GetToneLetter() { return NoteUtils.GetToneLetter(noteTone); }
 
-    public char GetToneLetter()
-    {
-        return NoteUtils.GetToneLetter(noteTone);
-    }
+    public int GetOctave() { return octave; }
 
-    public int GetOctave()
-    {
-        return octave;
-    }
+    public void SetOctave(int octave) { this.octave = octave; }
 
-    public string GetAccidental()
-    {
-        return accidental;
-    }
+    public bool HasAccidental() { return accidental != ""; }
 
-    public int ToMidiNote()
-    {
-        return NoteUtils.ToMidiNote(this);
-    }
+    public string GetAccidental() { return accidental; }
+
+    public int ToMidiNote() { return NoteUtils.ToMidiNote(this); }
 }
 
 public partial class NoteExerciseBase : Node
 {
-    [Export] StaffController staffController;
+    [Export] protected StaffController staffController;
     [Export] protected Label scoreLabel;
     [Export] protected RichTextLabel feedbackLabel;
     [Export] protected Button startButton, resetButton;
@@ -197,15 +183,20 @@ public partial class NoteExerciseBase : Node
         SubmitNote(noteTone, octave, accidental);
     }
 
+    public virtual void OnCorrectNote(Note note) {}
+    public virtual void OnWrongNote(Note note) {}
+
     public void SubmitNote(Note note)
     {
         if (waitingNote is null || IsWaiting()) return;
+
         if (MatchesWaitingNote(note))
         {
             SetFeedback("[color=green]Great![/color]");
             correct++;
             total++;
             UpdateScoreLabel();
+            OnCorrectNote(note);
             StartWaiting(correctWaitSeconds, Colors.Green, () => PickNewNote());
         }
         else
@@ -213,6 +204,7 @@ public partial class NoteExerciseBase : Node
             SetFeedback("[color=red]Wrong![/color]");
             total++;
             UpdateScoreLabel();
+            OnWrongNote(note);
             StartWaiting(wrongWaitSeconds, Colors.Red, () => SetFeedback("Try again!"));
         }
     }

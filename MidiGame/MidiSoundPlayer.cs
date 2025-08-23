@@ -130,7 +130,7 @@ public partial class MidiSoundPlayer : Node
 		notesDown.Add(midiNote);
 
 		Note note = NoteUtils.FromMidiNote(midiNote, preferFlat.ButtonPressed);
-		staffController.CallDeferred("UpdateNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
+		staffController.CallDeferred("AddNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
 	public void StopNote(int midiNote)
@@ -142,11 +142,9 @@ public partial class MidiSoundPlayer : Node
 		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
 		int nextMidiNote = -1;
 		if (notesDown.Count != 0) nextMidiNote = notesDown[notesDown.Count - 1];
-		Note note = NoteUtils.FromMidiNote(nextMidiNote, preferFlat.ButtonPressed);
-		if (note is not null)
-			staffController.CallDeferred("UpdateNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
-		else
-			staffController.CallDeferred("UpdateNote");
+
+		Note note = NoteUtils.FromMidiNote(midiNote, preferFlat.ButtonPressed);
+		staffController.CallDeferred("RemoveNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
 	public void SetVolume(int vol)

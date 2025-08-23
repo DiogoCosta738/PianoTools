@@ -38,27 +38,27 @@ public static class NoteUtils
 
     static Dictionary<string, (string shortName, int octaveShift)> flatEquivalent = new Dictionary<string, (string shortName, int octaveShift)>()
     {
-       // { "C", "" },
-       { "C#", ("Db", 0) },
-       // { "Cb", "B" },
-       // { "D", "" },
-       { "D#", ("Eb", 0) },
-       // { "Db", "C#" },
-       { "E", ("Fb", 0) },
-       // { "E#", "F" },
-       // { "Eb", "D#" },
-       // { "F", "E#" },
-       { "F#", ("Gb", 0) },
-       // { "Fb", "E" },
-       // { "G", "" },
-       { "G#", ("Ab", 0) },
-       // { "Gb", "F#" },
-       // { "A", "" },
-       { "A#", ("Bb", 0) },
-       // { "Ab", "G#" },
-       { "B", ("Cb", 1) },
-       // { "B#", "C" },
-       // { "Bb", "A#" },
+            // { "C", "" },
+        { "C#", ("Db", 0) },
+            // { "Cb", "B" },
+            // { "D", "" },
+        { "D#", ("Eb", 0) },
+            // { "Db", "C#" },
+        // { "E", ("Fb", 0) },  // although they have a flat equivalent, we don't want to use them
+            // { "E#", "F" },
+            // { "Eb", "D#" },
+            // { "F", "E#" },
+        { "F#", ("Gb", 0) },
+            // { "Fb", "E" },
+            // { "G", "" },
+        { "G#", ("Ab", 0) },
+            // { "Gb", "F#" },
+            // { "A", "" },
+        { "A#", ("Bb", 0) },
+            // { "Ab", "G#" },
+        // { "B", ("Cb", 1) }, // although they have a flat equivalent, we don't want to use them
+            // { "B#", "C" },
+            // { "Bb", "A#" },
     };
 
     static bool[] noteAccidental = {

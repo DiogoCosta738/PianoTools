@@ -158,7 +158,9 @@ public partial class NoteExerciseBase : Node
     void PickNewNote()
     {
         waitingNote = GenerateNote();
-        staffController.UpdateNote(waitingNote, 0, !useLabelCheck.ButtonPressed, !useSheetCheck.ButtonPressed);
+        staffController.HideLabel(0, useLabelCheck.ButtonPressed);
+        staffController.HideNote(0, useSheetCheck.ButtonPressed);
+        staffController.AddNote(waitingNote, 0);
         SetFeedback("Play note!");
     }
 

@@ -21,9 +21,15 @@ public partial class StaffController : Control
 
     List<ColorRect> staffLines;
 
-    List<NoteHeadUI> noteHeads;
+    List<bool> hideLabels;
+    List<bool> hideRendering;
+    List<List<NoteHeadUI>> noteHeads;
+    List<List<Note>> notes;
     List<Label> noteLabels;
     List<List<ColorRect>> notePartialLines;
+
+    List<NoteHeadUI> unusedHeads = new List<NoteHeadUI>();
+    List<ColorRect> unusedPartialLines = new List<ColorRect>();
 
     List<int> notesDown;
 
@@ -43,6 +49,16 @@ public partial class StaffController : Control
 
     StaffType staffType = StaffType.Grand;
 
+    public void HideNote(int idx, bool hide)
+    {
+        hideRendering[idx] = hide;
+    }
+
+    public void HideLabel(int idx, bool hide)
+    {
+        hideLabels[idx] = hide;
+    }
+
     public void ClearStaff()
     {
         foreach (var line in staffLines)
@@ -54,12 +70,22 @@ public partial class StaffController : Control
 
     ColorRect CreateLine(float x, float y, float width)
     {
-        ColorRect line = new ColorRect();
+        ColorRect line;
+        if (unusedPartialLines.Count != 0)
+        {
+            line = unusedPartialLines[unusedPartialLines.Count - 1];
+            unusedPartialLines.RemoveAt(unusedPartialLines.Count - 1);
+        }
+        else
+        {
+            line = new ColorRect();
+            line.Color = Colors.Black;
+            notesContainer.AddChild(line);
+        }
+
         line.Visible = true;
-        line.Color = Colors.Black;
-        line.CustomMinimumSize = new Vector2(width, thickness);
+        line.Size = new Vector2(width, thickness);
         line.Position = new Vector2(x - width / 2, y - thickness / 2);
-        notesContainer.AddChild(line);
         return line;
     }
 
@@ -115,6 +141,7 @@ public partial class StaffController : Control
     {
         float firstStaffHeight = spacing / 2;
         float secondStaffHeight = spacing * 3 + spacing * 5 + spacing / 2; // the first note c4 is where?
+        // !TODO refactor to use heightIndex to be more readable and conform to the adjacency check
         switch (staffType)
         {
             case StaffType.Treble:
@@ -135,35 +162,19 @@ public partial class StaffController : Control
         return 0;
     }
 
-    public void UpdateNote(int noteTone, int octave, string accidental)
-    {
-        UpdateNote(new Note(noteTone, octave, accidental), 1);
-    }
-
-    public void UpdateNote()
-    {
-        UpdateNote(null, 1);
-    }
-
-    public void UpdateNote(Note note)
-    {
-        UpdateNote(note, 1);
-    }
-
     const int A5 = 69; // first (lowest) note requiring ledger line above treble staff
     const int E2 = 28; // first (highest) note requiring ledger line below bass staff
     const int C4 = 48; // first (highest) note requiring ledger line below treble staff and first (lowest) above bass staff
 
     // as a list of y positions
-    List<float> GetPartialLinesRequired(Note note)
+    void AddPartialLinesRequired(Note note, HashSet<float> lines)
     {
         // the trick here is to ignore the accidental and use pure tone logic (it's the note that determines the height, accidentals are irrelevant and only confound)
         note = note.Clone();
         note.SetAccidental("");
         int midiIndex = note.ToMidiNote();
 
-        List<float> lines = new List<float>();
-        void local_handle_semitone(int midiIndex, ref bool include, List<float> extraLines)
+        void local_handle_semitone(int midiIndex, ref bool include, HashSet<float> extraLines)
         {
             if (NoteUtils.HasAccidental(midiIndex))
                 return;
@@ -200,90 +211,167 @@ public partial class StaffController : Control
         }
         else if (staffType == StaffType.Grand && midiIndex == C4)
         {
-            return new List<float>() { GetNoteHeight(0, 4) };
+            lines.Add(GetNoteHeight(0, 4));
+            return;
         }
-        return lines;
+        return;
     }
 
-    public void UpdateNote(Note note, int idx, bool hideLabel = false, bool hideNote = false)
+    public NoteHeadUI GetNewNoteHead()
     {
+        if (unusedHeads.Count != 0)
+        {
+            NoteHeadUI head = unusedHeads[unusedHeads.Count - 1];
+            unusedHeads.RemoveAt(unusedHeads.Count - 1);
+            return head;
+        }
+
+        NoteHeadUI newHead = (NoteHeadUI)noteHeadTemplate.Duplicate();
+        newHead.CopyFrom(noteHeadTemplate);
+        notesContainer.AddChild(newHead);
+        return newHead;
+    }
+
+    public void AddNote(int noteTone, int octave, string accidental) { AddNote(new Note(noteTone, octave, accidental), 1); }
+    public void AddNote(Note note) { AddNote(note, 1); }
+    public void RemoveNote(int noteTone, int octave, string accidental) { RemoveNote(new Note(noteTone, octave, accidental), 1); }
+    public void RemoveNote(Note note) { RemoveNote(note, 1); }
+
+    public void AddNote(Note note, int idx)
+    {
+        notes[idx].Add(note);
+        UpdateNotesAtPosition(idx);
+    }
+
+    public void RemoveNote(Note note, int idx)
+    {
+        notes[idx].Remove(note);
+        UpdateNotesAtPosition(idx);
+    }
+
+    bool AreNotesAdjacent(Note note1, Note note2)
+    {
+        int heightIndex1 = note1.GetToneIndex() + note1.GetOctave() * 7;
+        int heightIndex2 = note2.GetToneIndex() + note2.GetOctave() * 7;
+        return Mathf.Abs(heightIndex1 - heightIndex2) <= 1;
+    }
+
+    void UpdateNotesAtPosition(int idx)
+    {
+        // clear partial lines
         foreach (var partial in notePartialLines[idx])
-            {
-                partial.QueueFree();
-            }
+        {
+            partial.Visible = false;
+            unusedPartialLines.Add(partial);
+        }
         notePartialLines[idx].Clear();
 
-        if (note is null)
+        // clear note heads
+        for (int i = 0; i < noteHeads[idx].Count; i++)
+        {
+            NoteHeadUI head = noteHeads[idx][i];
+            head.Visible = false;
+            unusedHeads.Add(head);
+        }
+        noteHeads[idx].Clear();
+
+        // no notes being rendered
+        if (notes[idx].Count == 0)
         {
             noteLabels[idx].Visible = false;
-            noteHeads[idx].Visible = false;
             return;
         }
 
-        List<float> extraLines = GetPartialLinesRequired(note);
-        if (extraLines is not null)
+        noteLabels[idx].Visible = !hideLabels[idx];
+        noteLabels[idx].Text = notes[idx][0].GetNameShort();
+
+        notes[idx].Sort((note1, note2) =>
         {
-            foreach (float y in extraLines)
+            float height1 = GetNoteHeight(note1.GetToneIndex(), note1.GetOctave()), height2 = GetNoteHeight(note2.GetToneIndex(), note2.GetOctave());
+            if (height1 != height2)
+                return Mathf.Sign(height1 - height2);
+            else
+                return note1.ToMidiNote() - note2.ToMidiNote();
+        });
+        notes[idx].Reverse();
+        foreach (Note note in notes[idx]) GD.Print(note.ToMidiNote());
+
+        HashSet<float> partialLines = new HashSet<float>();
+        bool extendedPartials = false;
+        bool outward = false;
+        for (int i = 0; i < notes[idx].Count; i++)
+        {
+            NoteHeadUI head = GetNewNoteHead();
+            head.Visible = true;
+            noteHeads[idx].Add(head);
+            Note note = notes[idx][i];
+
+            head.Visible = !hideRendering[idx];
+            // GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetToneIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
+            float xx = GetNoteCenterX(idx) - head.Size.X / 2;
+            float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - head.Size.Y / 2;
+
+            if (i > 0 && AreNotesAdjacent(notes[idx][i - 1], notes[idx][i]))
             {
-                ColorRect line = CreateLine(GetNoteCenterX(idx), y, columnWidth / 3);
+                outward ^= true;
+            }
+            else
+            {
+                outward = false;
+            }
+            extendedPartials |= outward;
+
+            head.Position = new Vector2(xx, yy);
+            head.Setup(note, outward);
+
+            AddPartialLinesRequired(note, partialLines);
+        }
+
+        if (partialLines.Count != 0)
+        {
+            foreach (float y in partialLines)
+            {
+                float width = (extendedPartials ? 2 : 1) * noteHeadTemplate.GetWidth() + 4;
+                ColorRect line = CreateLine(GetNoteCenterX(idx), y, width);
+                if (!extendedPartials)
+                    line.Position -= new Vector2(noteHeadTemplate.GetWidth() / 2, 0);
                 notePartialLines[idx].Add(line);
             }
         }
-
-        noteLabels[idx].Visible = !hideLabel;
-        noteLabels[idx].Text = note.GetNameShort();
-        noteHeads[idx].Visible = !hideNote;
-        noteHeads[idx].Setup(note);
-
-        GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetToneIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
-
-        float xx = GetNoteCenterX(idx) - noteHeads[idx].Size.X / 2;
-        float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - noteHeads[idx].Size.Y / 2;
-
-        noteHeads[idx].Position = new Vector2(xx, yy);
     }
 
-    public float GetNoteCenterX(int index)
-    {
-        return leftMargin + columnWidth / 2 + columnWidth * index;
-    }
-
-    float GetSheetWidth()
-    {
-        return leftMargin + columnCount * columnWidth;
-    }
+    public float GetNoteCenterX(int index) { return leftMargin + columnWidth / 2 + columnWidth * index; }
+    float GetSheetWidth() { return leftMargin + columnCount * columnWidth; }
 
     public override void _Ready()
     {
         base._Ready();
 
+        noteHeadTemplate.InitTemplate();
+        
         noteLabels = new List<Label>();
-        noteHeads = new List<NoteHeadUI>();
+        noteHeads = new List<List<NoteHeadUI>>();
+        notes = new List<List<Note>>();
+        hideLabels = new List<bool>();
+        hideRendering = new List<bool>();
         notePartialLines = new List<List<ColorRect>>();
 
-        noteLabels.Add(noteLabel);
-        noteHeads.Add(noteHeadTemplate);
-        notePartialLines.Add(new List<ColorRect>());
-
-        for (int i = 1; i < columnCount; i++)
+        for (int i = 0; i < columnCount; i++)
         {
+            notes.Add(new List<Note>());
+            noteHeads.Add(new List<NoteHeadUI>());
             noteLabels.Add((Label)noteLabel.Duplicate());
-            noteHeads.Add((NoteHeadUI)noteHeadTemplate.Duplicate());
             notePartialLines.Add(new List<ColorRect>());
-
             labelsContainer.AddChild(noteLabels[i]);
-            notesContainer.AddChild(noteHeads[i]);
+            hideLabels.Add(false);
+            hideRendering.Add(false);
         }
 
         for (int i = 0; i < noteLabels.Count; i++)
         {
             noteLabels[i].Position = new Vector2(GetNoteCenterX(i) - noteLabel.Size.X / 2, noteLabel.Position.Y);
-            noteHeads[i].Position = new Vector2(GetNoteCenterX(i) - noteHeadTemplate.Size.X / 2, noteHeadTemplate.Position.Y);
+            UpdateNotesAtPosition(i);
         }
         BuildStaff();
-
-        for (int i = 0; i < noteLabels.Count; i++)
-            UpdateNote(null, i);
     }
-
 }

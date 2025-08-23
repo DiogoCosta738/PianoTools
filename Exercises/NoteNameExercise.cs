@@ -34,12 +34,12 @@ public partial class NoteNameExercise : NoteExerciseBase
         note = note.Clone();
         if (!HasOctave())
             note.SetOctave(waitingNote is not null ? waitingNote.GetOctave() : 5);
-        staffController.UpdateNote(note);
+        staffController.AddNote(note);
         midiSoundPlayer.PlayNote(note.ToMidiNote());
         Thread thread = new Thread(() =>
         {
             Thread.Sleep(durationMs);
-            staffController.CallDeferred("UpdateNote");
+            staffController.CallDeferred("RemoveNote", note.GetToneLetter(), note.GetOctave(), note.GetAccidental());
             midiSoundPlayer.CallDeferred("StopNote", note.ToMidiNote());
         });
         thread.Start();

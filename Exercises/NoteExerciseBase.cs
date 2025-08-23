@@ -124,8 +124,8 @@ public partial class NoteExerciseBase : Node
 
     protected virtual void Stop()
     {
-        waitingNote = null;
         if (waitingNote is not null) staffController.RemoveNote(waitingNote, 0);
+        waitingNote = null;
         startButton.Text = "Start";
     }
 

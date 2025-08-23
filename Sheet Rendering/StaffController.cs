@@ -27,10 +27,10 @@ public partial class StaffController : Control
 
     List<int> notesDown;
 
-    const float TreblePivotX = 1; // 14.0f / 24;
-    const float TreblePivotY = 35f / 54;
-    const float BassPivotX = 1; // 24.5f / 49;
-    const float BassPivotY = 9.5f / 29;
+    const float TreblePivotX = 235f / 364f; // 14.0f / 24;
+    const float TreblePivotY = 570f / 899f;
+    const float BassPivotX = 85f / 414f + 0.4f; // 24.5f / 49;
+    const float BassPivotY = 140f / 457f - 0.009f;
 
     const float thickness = 4; // thickness of a sheet line
     const float spacing = 20; // distance between two sheet lines
@@ -38,7 +38,7 @@ public partial class StaffController : Control
     const float secondStaffTopMargin = firstStaffTopMargin + 5 * spacing + 2 * spacing; // 5 lines from first staff plus two full lines
 
     int columnCount = 2;
-    int leftMargin = 50;
+    int leftMargin = 75;
     int columnWidth = 100;
 
     StaffType staffType = StaffType.Grand;
@@ -101,7 +101,7 @@ public partial class StaffController : Control
         trebleClef.Visible = staffType == StaffType.Treble || staffType == StaffType.Grand;
         bassClef.Visible = staffType == StaffType.Bass || staffType == StaffType.Grand;
 
-        float offsetX = Mathf.Max(trebleClef.Size.X * trebleClef.Scale.X, bassClef.Size.X * bassClef.Scale.X);
+        float offsetX = Mathf.Max(trebleClef.Size.X * trebleClef.Scale.X, bassClef.Size.X * bassClef.Scale.X) - 20;
         trebleClef.Position = new Vector2(
             offsetX - trebleClef.Size.X * TreblePivotX * trebleClef.Scale.X,
             GetNoteHeight(NOTE_G, 4) - trebleClef.Size.Y * trebleClef.Scale.Y * TreblePivotY);

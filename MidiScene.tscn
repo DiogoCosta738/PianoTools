@@ -14,12 +14,12 @@
 [ext_resource type="Script" uid="uid://dxtbbmwmy60r2" path="res://Sheet Rendering/StaffController.cs" id="8_pqyki"]
 [ext_resource type="Script" uid="uid://dj77wha64q0wf" path="res://Exercises/NoteNameExercise.cs" id="9_sdowb"]
 [ext_resource type="Script" uid="uid://d3umuwkyvq60n" path="res://GenericUI/DraggablePanelContainer.cs" id="12_y4h0a"]
-[ext_resource type="Texture2D" uid="uid://dfffv7gic5y5p" path="res://Assets/Treble clef.png" id="14_xhnu0"]
-[ext_resource type="Texture2D" uid="uid://bmtes7wmo1dy" path="res://Assets/Flat.png" id="15_6vv3c"]
-[ext_resource type="Texture2D" uid="uid://be4ounb3a3fj4" path="res://Assets/Bass Clef.png" id="15_d43md"]
+[ext_resource type="Texture2D" uid="uid://c6nw181bdk6ob" path="res://Assets/MuseScore/TrebleClef_20.png" id="13_6vv3c"]
+[ext_resource type="Texture2D" uid="uid://dvcjkkrdwl6wf" path="res://Assets/MuseScore/BassClef_20.png" id="14_uhv7c"]
 [ext_resource type="Script" uid="uid://bt1wuowdplfe3" path="res://Sheet Rendering/NoteHeadUI.cs" id="15_uhv7c"]
-[ext_resource type="Texture2D" uid="uid://u6pjl0bwxd5w" path="res://Assets/Stemless notehead open.png" id="15_v7ivg"]
-[ext_resource type="Texture2D" uid="uid://ccvauehnglu4p" path="res://Assets/Sharp.png" id="16_uhv7c"]
+[ext_resource type="Texture2D" uid="uid://ditmwaahlr2vh" path="res://Assets/MuseScore/Flat.png" id="16_6vv3c"]
+[ext_resource type="Texture2D" uid="uid://v5nnnkvqwufa" path="res://Assets/MuseScore/Sharp.png" id="17_uhv7c"]
+[ext_resource type="Texture2D" uid="uid://b0bldo884m5y3" path="res://Assets/MuseScore/music_notation_font_extract.png" id="18_6vv3c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pqyki"]
 bg_color = Color(1, 1, 1, 1)
@@ -247,11 +247,12 @@ grow_vertical = 2
 color = Color(1, 0, 0, 0.431373)
 
 [node name="TrebleClef" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer"]
+modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 364.0
-offset_bottom = 899.0
-scale = Vector2(0.15, 0.15)
-texture = ExtResource("14_xhnu0")
+offset_right = 161.0
+offset_bottom = 421.0
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("13_6vv3c")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/TrebleClef"]
 visible = false
@@ -264,11 +265,12 @@ grow_vertical = 2
 color = Color(1, 0, 0, 0.470588)
 
 [node name="BassClef" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer"]
+modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 414.0
-offset_bottom = 457.0
-scale = Vector2(0.15, 0.15)
-texture = ExtResource("15_d43md")
+offset_right = 165.0
+offset_bottom = 215.0
+scale = Vector2(0.32, 0.32)
+texture = ExtResource("14_uhv7c")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/BassClef"]
 visible = false
@@ -288,11 +290,15 @@ sharpTexture = NodePath("Sharp")
 headTexture = NodePath("NoteHead")
 
 [node name="Flat" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead"]
+modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 160.0
-offset_bottom = 335.0
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("15_6vv3c")
+offset_left = -101.0
+offset_top = 9.0
+offset_right = -74.0
+offset_bottom = 83.0
+scale = Vector2(0.4, 0.4)
+pivot_offset = Vector2(12, 52)
+texture = ExtResource("16_6vv3c")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead/Flat"]
 visible = false
@@ -305,11 +311,15 @@ grow_vertical = 2
 color = Color(1, 0, 0, 0.45098)
 
 [node name="Sharp" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead"]
+modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 151.0
-offset_bottom = 373.0
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("16_uhv7c")
+offset_left = -168.0
+offset_top = -45.0
+offset_right = -138.0
+offset_bottom = 39.0
+scale = Vector2(0.4, 0.4)
+pivot_offset = Vector2(15, 42)
+texture = ExtResource("17_uhv7c")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead/Sharp"]
 visible = false
@@ -322,11 +332,15 @@ grow_vertical = 2
 color = Color(0, 0.0666666, 1, 0.45098)
 
 [node name="NoteHead" type="TextureRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead"]
+modulate = Color(0, 0, 0, 1)
 layout_mode = 0
-offset_right = 211.0
-offset_bottom = 184.0
-scale = Vector2(0.15, 0.15)
-texture = ExtResource("15_v7ivg")
+offset_left = -153.0
+offset_top = -22.0
+offset_right = -92.0
+offset_bottom = 16.0
+scale = Vector2(0.5, 0.5)
+pivot_offset = Vector2(30.5, 19)
+texture = ExtResource("18_6vv3c")
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer/StaffController/MarginContainer/VBoxContainer/SheetContainer/NoteHead/NoteHead"]
 visible = false
@@ -404,11 +418,11 @@ text = "Score: 0 / 0 (100%)"
 [node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 
-[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Use flats"
 
-[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 text = "Use sharps"
 
@@ -472,11 +486,11 @@ text = "Score: 0 / 0 (100%)"
 [node name="HSeparator3" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
 layout_mode = 2
 
-[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
 layout_mode = 2
 text = "Use flats"
 
-[node name="FlatsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
+[node name="SharpsCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note"]
 layout_mode = 2
 text = "Use sharps"
 
@@ -520,10 +534,10 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = 5.0
-offset_right = 18.0
-offset_bottom = 5.0
+offset_left = 145.0
+offset_top = -19.0
+offset_right = 145.0
+offset_bottom = -19.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2

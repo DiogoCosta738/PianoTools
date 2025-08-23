@@ -102,6 +102,7 @@ public partial class NoteExerciseBase : Node
 
     protected virtual void Reset()
     {
+        if (waitingNote is not null) staffController.RemoveNote(waitingNote, 0);
         waitingNote = null;
         ResetScore();
         ResetWaiting();
@@ -124,6 +125,7 @@ public partial class NoteExerciseBase : Node
     protected virtual void Stop()
     {
         waitingNote = null;
+        if (waitingNote is not null) staffController.RemoveNote(waitingNote, 0);
         startButton.Text = "Start";
     }
 
@@ -157,9 +159,10 @@ public partial class NoteExerciseBase : Node
 
     void PickNewNote()
     {
+        if (waitingNote is not null) staffController.RemoveNote(waitingNote, 0);
         waitingNote = GenerateNote();
-        staffController.HideLabel(0, useLabelCheck.ButtonPressed);
-        staffController.HideNote(0, useSheetCheck.ButtonPressed);
+        staffController.HideLabel(0, !RenderName());
+        staffController.HideNote(0, !RenderNote());
         staffController.AddNote(waitingNote, 0);
         SetFeedback("Play note!");
     }
@@ -184,11 +187,13 @@ public partial class NoteExerciseBase : Node
         SubmitNote(noteTone, octave, accidental);
     }
 
-    public virtual void OnCorrectNote(Note note) {}
+    public virtual void OnSubmitNote(Note note) {}
+    public virtual void OnCorrectNote(Note note) { }
     public virtual void OnWrongNote(Note note) {}
 
     public void SubmitNote(Note note)
     {
+        OnSubmitNote(note);
         if (waitingNote is null || IsWaiting()) return;
 
         if (MatchesWaitingNote(note))
@@ -232,7 +237,7 @@ public partial class NoteExerciseBase : Node
         OnDoneWaiting = onDoneWaiting;
     }
 
-    bool IsWaiting()
+    protected bool IsWaiting()
     {
         return curWait < waitTarget;
     }

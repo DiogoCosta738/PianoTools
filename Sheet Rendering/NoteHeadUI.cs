@@ -48,6 +48,13 @@ public partial class NoteHeadUI : Control
         flatPivot = source.flatPivot;
         sharpPivot = source.sharpPivot;
         headPivot = source.headPivot;
+
+        accidentalPivots = new Dictionary<string, Vector2>()
+        {
+            { "", Vector2.Zero },
+            { "b", flatPivot } ,
+            { "#", sharpPivot },
+        };
     }
 
     public float GetWidth()
@@ -83,12 +90,15 @@ public partial class NoteHeadUI : Control
         }
 
         SetPositionByPivot(headTexture, new Vector2(headX, 0), headPivot);
-        if(accidentalTex is not null)
+        if (accidentalTex is not null)
+        {
+            accidentalTex.Visible = true;
             SetPositionByPivot(accidentalTex, new Vector2(accidentalX, 0), accidentalPivots[note.GetAccidental()]);
+        }
 
         // DebugPositions(headX, accidentalX);
 
-        Size = new Vector2(0, 0);
+            Size = new Vector2(0, 0);
     }
 
     void DebugPositions(float headX, float accidentalX)

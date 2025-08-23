@@ -35,18 +35,18 @@ public partial class NoteNameExercise : NoteExerciseBase
         if (!HasOctave())
             note.SetOctave(waitingNote is not null ? waitingNote.GetOctave() : 5);
         staffController.AddNote(note);
-        midiSoundPlayer.PlayNote(note.ToMidiNote());
+        midiSoundPlayer.PlayNote(note.ToMidiNote(), skipStaff: true);
         Thread thread = new Thread(() =>
         {
             Thread.Sleep(durationMs);
-            staffController.CallDeferred("RemoveNote", note.GetToneLetter(), note.GetOctave(), note.GetAccidental());
-            midiSoundPlayer.CallDeferred("StopNote", note.ToMidiNote());
+            staffController.CallDeferred("RemoveNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
+            midiSoundPlayer.CallDeferred("StopNote", note.ToMidiNote(), true);
         });
         thread.Start();
     }
 
+    public override void OnSubmitNote(Note note) { if(waitingNote is null || IsWaiting()) AddFeedbackNote(note, 1000); }
     public override void OnCorrectNote(Note note) { AddFeedbackNote(note, Mathf.RoundToInt(correctWaitSeconds * 1000)); }
-
     public override void OnWrongNote(Note note) { AddFeedbackNote(note, Mathf.RoundToInt(wrongWaitSeconds * 1000)); }
 
     void CloseInput()
@@ -54,6 +54,7 @@ public partial class NoteNameExercise : NoteExerciseBase
         if (inputDlg == null) return;
         inputDlg.QueueFree();
         inputDlg = null;
+        openInputButton.Text = "Open input menu";
     }
 
     void OpenInput(bool force = false)
@@ -64,12 +65,19 @@ public partial class NoteNameExercise : NoteExerciseBase
         int minOctave = HasOctave() ? 2 : -1;
         int maxOctave = HasOctave() ? 6 : -1;
         inputDlg = DialogueFactory.Instance.GetNoteNameInputDialogue(HasSharp(), HasFlat(), minOctave, maxOctave, SubmitNote);
+        openInputButton.Text = "Close input menu";
     }
 
     public override void _Ready()
     {
         base._Ready();
-        openInputButton.Pressed += () => { OpenInput(true); };
+        openInputButton.Pressed += () =>
+        {
+            if (inputDlg is null)
+                OpenInput();
+            else
+                CloseInput();
+        };
     }
 
     protected override void Start()

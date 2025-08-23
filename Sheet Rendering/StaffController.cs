@@ -294,7 +294,6 @@ public partial class StaffController : Control
                 return note1.ToMidiNote() - note2.ToMidiNote();
         });
         notes[idx].Reverse();
-        foreach (Note note in notes[idx]) GD.Print(note.ToMidiNote());
 
         HashSet<float> partialLines = new HashSet<float>();
         bool extendedPartials = false;
@@ -348,7 +347,8 @@ public partial class StaffController : Control
         base._Ready();
 
         noteHeadTemplate.InitTemplate();
-        
+        noteHeadTemplate.Visible = false;
+
         noteLabels = new List<Label>();
         noteHeads = new List<List<NoteHeadUI>>();
         notes = new List<List<Note>>();
@@ -366,6 +366,7 @@ public partial class StaffController : Control
             hideLabels.Add(false);
             hideRendering.Add(false);
         }
+        noteLabel.Visible = false;
 
         for (int i = 0; i < noteLabels.Count; i++)
         {

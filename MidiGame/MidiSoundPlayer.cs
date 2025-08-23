@@ -78,7 +78,7 @@ public partial class MidiSoundPlayer : Node
 		pianoController.OnNoteDown += (note) => PlayNote(note);
 		pianoController.OnNoteUp += StopNote;
 
-		midiInputController.OnNoteDown += PlayNote;
+		midiInputController.OnNoteDown += (note, velocity) => PlayNote(note, velocity);
 		midiInputController.OnNoteUp += StopNote;
 
 		soundfontConfigUI.OnNoteChange += UpdateNotes; 
@@ -120,7 +120,7 @@ public partial class MidiSoundPlayer : Node
 		_channel = channel;
 	}
 
-	public void PlayNote(int midiNote, int velocity = 100)
+	public void PlayNote(int midiNote, int velocity = 100, bool skipStaff = false)
 	{
 		GD.Print("Note on: ", midiNote, " ", velocity);
 		_player.PlayNote(_channel, midiNote, velocity);
@@ -130,21 +130,21 @@ public partial class MidiSoundPlayer : Node
 		notesDown.Add(midiNote);
 
 		Note note = NoteUtils.FromMidiNote(midiNote, preferFlat.ButtonPressed);
-		staffController.CallDeferred("AddNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
+		if(!skipStaff)
+			staffController.CallDeferred("AddNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
-	public void StopNote(int midiNote)
+	public void StopNote(int midiNote) { StopNote(midiNote, false); }
+	public void StopNote(int midiNote, bool skipStaff)
 	{
 		GD.Print("Note off: ", midiNote);
 		_player.StopNote(_channel, midiNote);
 		pianoController.NoteOff(midiNote);
 
 		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
-		int nextMidiNote = -1;
-		if (notesDown.Count != 0) nextMidiNote = notesDown[notesDown.Count - 1];
-
 		Note note = NoteUtils.FromMidiNote(midiNote, preferFlat.ButtonPressed);
-		staffController.CallDeferred("RemoveNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
+		if (!skipStaff)
+			staffController.CallDeferred("RemoveNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
 	public void SetVolume(int vol)

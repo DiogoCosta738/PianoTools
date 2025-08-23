@@ -7,8 +7,17 @@
 bg_color = Color(0.172549, 0.172549, 0.172549, 1)
 
 [node name="NoteInputPanel" type="PanelContainer" node_paths=PackedStringArray("octavesPanel", "octavesLabel", "octavesSlider", "octavesContainer", "notesPanel", "noteLabel", "buttonContainer")]
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -56.0
+offset_top = -130.0
+offset_right = 56.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_y4h0a")
 script = ExtResource("1_k63bj")
 octavesPanel = NodePath("VBoxContainer/MarginContainer/VBoxContainer/OctavesPanel")

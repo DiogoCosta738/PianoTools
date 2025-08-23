@@ -149,12 +149,10 @@ public partial class NoteExerciseBase : Node
         while (newNote == -1)
         {
             newNote = rng.Next() % noteRange + noteMin;
-            if (NoteUtils.HasAccidental(newNote) && !HasSharp() && !HasFlat())
-            {
+            if (NoteUtils.HasAccidental(newNote) && !HasFlat() && !HasSharp())
                 newNote = -1;
-            }
         }
-        return NoteUtils.FromMidiNote(newNote, false);
+        return NoteUtils.FromMidiNote(newNote, preferFlat: HasFlat() && (!HasSharp() || rng.Next() % 2 == 1));
     }
 
     void PickNewNote()

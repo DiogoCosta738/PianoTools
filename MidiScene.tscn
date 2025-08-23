@@ -66,10 +66,11 @@ useFlatsCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabCon
 waitBackground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/WaitBackground")
 waitForeground = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/WaitBackground/WaitForeground")
 
-[node name="NoteNameExerciseController" type="Node" parent="." node_paths=PackedStringArray("openInputButton", "octavesCheck", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
+[node name="NoteNameExerciseController" type="Node" parent="." node_paths=PackedStringArray("openInputButton", "octavesCheck", "midiSoundPlayer", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
 script = ExtResource("9_sdowb")
 openInputButton = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/InputMenuButton")
 octavesCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/OctavesCheck")
+midiSoundPlayer = NodePath("../MidiSoundPlayer")
 staffController = NodePath("../CanvasLayer/StaffController")
 scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/ScoreLabel")
 feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Name note/Name note/FeedbackLabel")
@@ -182,6 +183,10 @@ layout_mode = 2
 size_flags_vertical = 0
 text = "Hide/Show
 "
+
+[node name="PreferFlatCheck" type="CheckBox" parent="CanvasLayer/VisualTranspositionControls/LeftPanel"]
+layout_mode = 2
+text = "Prefer flat"
 
 [node name="PianoController" type="Control" parent="CanvasLayer"]
 layout_mode = 3
@@ -296,7 +301,7 @@ offset_left = -101.0
 offset_top = 9.0
 offset_right = -74.0
 offset_bottom = 83.0
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.5, 0.5)
 pivot_offset = Vector2(12, 52)
 texture = ExtResource("16_6vv3c")
 
@@ -317,7 +322,7 @@ offset_left = -168.0
 offset_top = -45.0
 offset_right = -138.0
 offset_bottom = 39.0
-scale = Vector2(0.4, 0.4)
+scale = Vector2(0.5, 0.5)
 pivot_offset = Vector2(15, 42)
 texture = ExtResource("17_uhv7c")
 
@@ -542,7 +547,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController")]
+[node name="MidiSoundPlayer" type="Node" parent="." node_paths=PackedStringArray("pianoController", "instrumentOptions", "keyboardController", "soundfontConfigUI", "midiInputController", "staffController", "preferFlat")]
 script = ExtResource("4_kjjcl")
 pianoController = NodePath("../CanvasLayer/PianoController")
 instrumentOptions = NodePath("../CanvasLayer/VisualTranspositionControls/LeftPanel/InstrumentDropdown")
@@ -552,3 +557,4 @@ midiInputController = NodePath("../MidiKeyboardController")
 staffController = NodePath("../CanvasLayer/StaffController")
 _soundfontPath = "res://soundfonts/Arachno_SoundFont_Version_1.0.sf2"
 _midiPath = "res://midi/zeldalullaby.mid"
+preferFlat = NodePath("../CanvasLayer/VisualTranspositionControls/LeftPanel/PreferFlatCheck")

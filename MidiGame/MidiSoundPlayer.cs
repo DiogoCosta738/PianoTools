@@ -20,6 +20,8 @@ public partial class MidiSoundPlayer : Node
 
 	[Export(PropertyHint.File)] string _soundfontPath;
 	[Export(PropertyHint.File)] string _midiPath;
+	[Export] CheckBox preferFlat;
+
 	List<MMDevice> _devices;
 	MMDevice _selectedDevice;
 
@@ -127,7 +129,7 @@ public partial class MidiSoundPlayer : Node
 		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
 		notesDown.Add(midiNote);
 
-		Note note = NoteUtils.FromMidiNote(midiNote);
+		Note note = NoteUtils.FromMidiNote(midiNote, preferFlat.ButtonPressed);
 		staffController.CallDeferred("UpdateNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 	}
 
@@ -140,7 +142,7 @@ public partial class MidiSoundPlayer : Node
 		if (notesDown.Contains(midiNote)) notesDown.Remove(midiNote);
 		int nextMidiNote = -1;
 		if (notesDown.Count != 0) nextMidiNote = notesDown[notesDown.Count - 1];
-		Note note = NoteUtils.FromMidiNote(nextMidiNote);
+		Note note = NoteUtils.FromMidiNote(nextMidiNote, preferFlat.ButtonPressed);
 		if (note is not null)
 			staffController.CallDeferred("UpdateNote", note.GetToneIndex(), note.GetOctave(), note.GetAccidental());
 		else

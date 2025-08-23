@@ -6,8 +6,9 @@ using System.IO;
 public partial class PianoUIController : Control
 {
 	[Export] bool mouseInput = true;
-	[Export(PropertyHint.File)] string pianoKeyScene;
-	private Vector4I _margins = new Vector4I(1,1,1,1) * 20;
+	[Export(PropertyHint.File)] string pianoKeyScene;	
+
+	private Vector4I _margins = new Vector4I(1, 1, 1, 1) * 20;
 	private int _octaves = 3;
 	private int _lowestNote = -1;
 

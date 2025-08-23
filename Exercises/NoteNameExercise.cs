@@ -6,6 +6,7 @@ public partial class NoteNameExercise : NoteExerciseBase
 {
     [Export] Button openInputButton;
     [Export] CheckBox octavesCheck;
+    [Export] MidiSoundPlayer midiSoundPlayer;
 
     NoteNameInput inputDlg;
 
@@ -34,10 +35,12 @@ public partial class NoteNameExercise : NoteExerciseBase
         if (!HasOctave())
             note.SetOctave(waitingNote is not null ? waitingNote.GetOctave() : 5);
         staffController.UpdateNote(note);
+        midiSoundPlayer.PlayNote(note.ToMidiNote());
         Thread thread = new Thread(() =>
         {
             Thread.Sleep(durationMs);
             staffController.CallDeferred("UpdateNote");
+            midiSoundPlayer.CallDeferred("StopNote", note.ToMidiNote());
         });
         thread.Start();
     }

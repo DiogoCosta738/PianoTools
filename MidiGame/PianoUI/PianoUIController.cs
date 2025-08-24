@@ -88,7 +88,7 @@ public partial class PianoUIController : Control
 
 	private PianoUIKey[] pianoKeys;
 	private int _mousePlayedKey;
-	private int _hoveredKey;
+	private int _hoveredKey = -1;
 	private bool GLISSANDO = false;
 
 	public void SetLowestNote(int lowestNote)

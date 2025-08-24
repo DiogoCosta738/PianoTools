@@ -7,7 +7,7 @@
 bg_color = Color(0.172549, 0.172549, 0.172549, 1)
 
 [node name="NoteInputPanel" type="PanelContainer" node_paths=PackedStringArray("octavesPanel", "octavesLabel", "octavesSlider", "octavesContainer", "notesPanel", "noteLabel", "buttonContainer")]
-anchors_preset = -1
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5

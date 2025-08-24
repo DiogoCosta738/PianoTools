@@ -275,6 +275,8 @@ public partial class StaffController : Control
         }
         noteHeads[idx].Clear();
 
+        if (hideRendering[idx]) return;
+
         // no notes being rendered
         if (notes[idx].Count == 0)
         {
@@ -304,8 +306,7 @@ public partial class StaffController : Control
             head.Visible = true;
             noteHeads[idx].Add(head);
             Note note = notes[idx][i];
-
-            head.Visible = !hideRendering[idx];
+            head.Visible = true;
             // GD.Print("Note index: ", note.ToMidiNote(), " Note letter index: ", note.GetToneIndex(), " Octave: ", note.GetOctave(), "Height: ", GetNoteHeight(note.GetToneIndex(), note.GetOctave()));
             float xx = GetNoteCenterX(idx) - head.Size.X / 2;
             float yy = GetNoteHeight(note.GetToneIndex(), note.GetOctave()) - head.Size.Y / 2;

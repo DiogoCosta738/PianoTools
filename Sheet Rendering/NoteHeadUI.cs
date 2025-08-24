@@ -69,11 +69,10 @@ public partial class NoteHeadUI : Control
 
     public void Setup(Note note, bool outward = false)
     {
+        // hide both accidentals
         foreach (var acc in accidentals.Values)
-        {
-            if (acc is not null)
-                acc.Visible = false;
-        }
+            acc.Visible = false;
+
         TextureRect accidentalTex = accidentals[note.GetAccidental()];
 
         float headWidth = headTexture.Size.X * headTexture.Scale.X;
@@ -92,13 +91,13 @@ public partial class NoteHeadUI : Control
         SetPositionByPivot(headTexture, new Vector2(headX, 0), headPivot);
         if (accidentalTex is not null)
         {
+            // reveal only the relevant accidental
             accidentalTex.Visible = true;
             SetPositionByPivot(accidentalTex, new Vector2(accidentalX, 0), accidentalPivots[note.GetAccidental()]);
         }
 
         // DebugPositions(headX, accidentalX);
-
-            Size = new Vector2(0, 0);
+        Size = new Vector2(0, 0);
     }
 
     void DebugPositions(float headX, float accidentalX)

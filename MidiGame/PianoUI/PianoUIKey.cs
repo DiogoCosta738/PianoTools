@@ -61,6 +61,8 @@ public partial class PianoUIKey : Control
 		_rect = rect;
 		_note = note;
 		_isSemitone = isSemitone;
+		if (_isSemitone)
+			GD.Print("Here!");
 
 		Position = _rect.Position;
 		Size = _rect.Size;

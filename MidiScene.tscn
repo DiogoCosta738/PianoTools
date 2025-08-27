@@ -51,9 +51,11 @@ script = ExtResource("4_3pot7")
 [node name="KeyboardController" type="Node" parent="."]
 script = ExtResource("4_1iknw")
 
-[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
+[node name="NotePlayExerciseController" type="Node" parent="." node_paths=PackedStringArray("midiKeyboardController", "screenPianoController", "ignoreOctavesCheck", "staffController", "scoreLabel", "feedbackLabel", "startButton", "resetButton", "useLabelCheck", "useSheetCheck", "useSharpsCheck", "useFlatsCheck", "waitBackground", "waitForeground")]
 script = ExtResource("6_4vvoa")
 midiKeyboardController = NodePath("../MidiKeyboardController")
+screenPianoController = NodePath("../CanvasLayer/PianoController")
+ignoreOctavesCheck = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/OctavesCheck")
 staffController = NodePath("../CanvasLayer/StaffController")
 scoreLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/ScoreLabel")
 feedbackLabel = NodePath("../CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note/FeedbackLabel")
@@ -386,10 +388,9 @@ parent = NodePath("../..")
 
 [node name="TabContainer" type="TabContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer"]
 layout_mode = 2
-current_tab = 1
+current_tab = 0
 
 [node name="Play note" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer"]
-visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
@@ -431,6 +432,10 @@ text = "Use flats"
 layout_mode = 2
 text = "Use sharps"
 
+[node name="OctavesCheck" type="CheckBox" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
+layout_mode = 2
+text = "Ignore octaves"
+
 [node name="HSeparator2" type="HSeparator" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer/Play note/Play note"]
 layout_mode = 2
 
@@ -458,6 +463,7 @@ text = "Reset
 "
 
 [node name="Name note" type="MarginContainer" parent="CanvasLayer/NotePlayExerciseUI/VBoxContainer/TabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10

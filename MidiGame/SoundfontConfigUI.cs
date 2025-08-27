@@ -18,11 +18,11 @@ public partial class SoundfontConfigUI : Node
 	private bool _hidden = false;
 	private Tween menuTween = null;
 
-	private int octave = 3;
+	private int lowest_octave = 2;
 	public int Octave
 	{
-		get { return octave; }
-		set { octave = value; }
+		get { return lowest_octave; }
+		set { lowest_octave = value; }
 	}
 
 	private int transpose = 0;
@@ -43,7 +43,7 @@ public partial class SoundfontConfigUI : Node
 	
 	public void SetOctave(int octave)
 	{
-		this.octave = octave;
+		this.lowest_octave = octave;
 		octavesLabel.Text = octave.ToString();
 		OnNoteChange?.Invoke();
 	}
@@ -59,11 +59,11 @@ public partial class SoundfontConfigUI : Node
 	public override void _Ready()
 	{
 		hideButton.ButtonDown += ToggleHide;
-		SetOctave(3);
+		SetOctave(lowest_octave);
 		SetTranspose(0);
 
-		octaveDownButton.ButtonDown += () => SetOctave(octave - 1);
-		octaveUpButton.ButtonUp += () => SetOctave(octave + 1);
+		octaveDownButton.ButtonDown += () => SetOctave(lowest_octave - 1);
+		octaveUpButton.ButtonUp += () => SetOctave(lowest_octave + 1);
 
 		transposeDownButton.ButtonDown += () => SetTranspose(transpose - 1);
 		transposeUpButton.ButtonUp += () => SetTranspose(transpose + 1);

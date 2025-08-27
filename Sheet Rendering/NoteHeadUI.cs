@@ -71,7 +71,8 @@ public partial class NoteHeadUI : Control
     {
         // hide both accidentals
         foreach (var acc in accidentals.Values)
-            acc.Visible = false;
+            if(acc is not null)
+                acc.Visible = false;
 
         TextureRect accidentalTex = accidentals[note.GetAccidental()];
 

@@ -9,15 +9,15 @@ public partial class PianoUIController : Control
 	[Export(PropertyHint.File)] string pianoKeyScene;	
 
 	private Vector4I _margins = new Vector4I(1, 1, 1, 1) * 20;
-	private int _octaves = 3;
+	private int _octaves = 4;
 	private int _lowestNote = -1;
 
 	public Action<int> OnNoteDown, OnNoteUp;
 
 	private void Init()
 	{
-		pianoKeys = new PianoUIKey[_octaves * 12];
-		for(int i = 0; i < _octaves * 12; i++)
+		pianoKeys = new PianoUIKey[_octaves * 12 + 1];
+		for(int i = 0; i < pianoKeys.Length; i++)
 		{
 			int local_i = i;
 			//pianoKeys[i] = new PianoUIKey();
@@ -28,20 +28,13 @@ public partial class PianoUIController : Control
 			AddChild(pianoKeys[i]);
 		}
 
-		int cur_tone = 0;
-		int cur_note = 0;
-		for(int oct = 0; oct < _octaves; oct++)
+		for (int semitone = 0; semitone < pianoKeys.Length; semitone++)
 		{
-			for(int k = 0; k < 7; k++)
+			Note note = NoteUtils.FromMidiNote(semitone);
+			if (note.GetAccidental() != "")
 			{
-				if(has_sharp[cur_tone % 7])
-				{
-					cur_note++;
-					RemoveChild(pianoKeys[cur_note]);
-					AddChild(pianoKeys[cur_note]);
-				}
-				cur_note++;
-				cur_tone++;
+				RemoveChild(pianoKeys[semitone]);
+				AddChild(pianoKeys[semitone]);
 			}
 		}
 	}
@@ -249,34 +242,29 @@ public partial class PianoUIController : Control
 	{
 		Vector2I size = GetWindow().Size;
 		float xx = _margins.X;
-		float key_size_x = (size.X - _margins.X * 2) / (7 * _octaves);
+
+		float key_size_x = (size.X - _margins.X * 2) / (7 * _octaves + 1);
 		float semitone_key_size_x = key_size_x * 0.8f;
 		float key_size_y = 200;
 		float semitone_key_size_y = key_size_y * 0.6f;
-		int cur_tone = 0;
-		int cur_note = 0;
-		for(int oct = 0; oct < _octaves; oct++)
+		for(int semitone = 0; semitone < pianoKeys.Length; semitone++)
 		{
-			for(int k = 0; k < 7; k++)
+			Note note = NoteUtils.FromMidiNote(semitone);
+			Rect2 rect;
+			if (note.GetAccidental() == "")
 			{
-				Rect2 rect = new Rect2(xx, size.Y - _margins.W - key_size_y, key_size_x - 5, key_size_y);
-				pianoKeys[cur_note].Update(rect, cur_note, false);
-
-				if(has_sharp[cur_tone % 7])
-				{
-					cur_note++;
-
-					float xx1 = xx;
-					xx1 += key_size_x;
-					xx1 -= semitone_key_size_x / 2;
-					rect = new Rect2(xx1, size.Y - _margins.W - key_size_y, semitone_key_size_x - 5, semitone_key_size_y);
-					pianoKeys[cur_note].Update(rect, cur_note, true);
-				}
-
-				cur_note++;
-				cur_tone++;
+				rect = new Rect2(xx, size.Y - _margins.W - key_size_y, key_size_x - 5, key_size_y);
+				pianoKeys[semitone].Update(rect, semitone, false);
 				xx += key_size_x;
 			}
+			else
+			{
+				float xx1 = xx;
+				xx1 -= semitone_key_size_x / 2;
+				rect = new Rect2(xx1, size.Y - _margins.W - key_size_y, semitone_key_size_x - 5, semitone_key_size_y);
+				pianoKeys[semitone].Update(rect, semitone, true);
+			}
+			
 		}
 	}
 }
